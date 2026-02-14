@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: qst_postgres
+    environment:
+      POSTGRES_DB: qst
+      POSTGRES_USER: qst_app
+      POSTGRES_PASSWORD: qst_app_pwd
+    ports:
+      - "5432:5432"
+    volumes:
+      - qst_pgdata:/var/lib/postgresql/data
+      - ./infra/postgres/schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qst_app -d qst"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build: ./backend-spring
+    container_name: qst_backend
+    env_file:
+      - ./.env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/qst
+      SPRING_DATASOURCE_USERNAME: qst_app
+      SPRING_DATASOURCE_PASSWORD: qst_app_pwd
+      UPLOAD_DIR: /data/uploads
+      # Optional (already default):
+      # CORS_ORIGINS: http://localhost:3000
+    volumes:
+      - qst_uploads:/data/uploads
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: qst_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  qst_pgdata:
+  qst_uploads:
