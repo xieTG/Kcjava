@@ -1,0 +1,33 @@
+server:
+  port: 8000
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 15MB
+      max-request-size: 15MB
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/qst}
+    username: ${SPRING_DATASOURCE_USERNAME:qst_app}
+    password: ${SPRING_DATASOURCE_PASSWORD:qst_app_pwd}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+springdoc:
+  swagger-ui:
+    path: /docs
+  api-docs:
+    path: /openapi
+
+app:
+  jwtSecret: ${JWT_SECRET:dev_secret_change_me}
+  adminEmail: ${ADMIN_EMAIL:admin@example.com}
+  adminPassword: ${ADMIN_PASSWORD:admin123}
+  uploadDir: ${UPLOAD_DIR:/data/uploads}
+  corsOrigins: ${CORS_ORIGINS:http://localhost:3000}
