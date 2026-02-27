@@ -11,22 +11,22 @@ public class AppProperties {
      * Secret used to sign JWTs (HS256).
      * Mirrors the Python backend's JWT_SECRET env var.
      */
-    private String jwtSecret = "dev_secret_change_me";
+    private String jwtSecret;
 
-    private String adminEmail = "admin@example.com";
-    private String adminPassword = "admin123";
+    private String adminEmail;
+    private String adminPassword;
 
     /**
      * Directory where uploaded XLSX files are stored.
      * Default matches docker-compose volume (/data/uploads).
      */
-    private Path uploadDir = Path.of("/data/uploads");
+    private Path uploadDir;
 
     /**
      * Comma-separated list of allowed CORS origins.
      * Example: "http://localhost:3000,http://127.0.0.1:3000"
      */
-    private String corsOrigins = "http://localhost:3000";
+    private String corsOrigins;
 
     public String getJwtSecret() {
         return jwtSecret;

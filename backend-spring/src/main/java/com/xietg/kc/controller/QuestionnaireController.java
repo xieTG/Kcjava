@@ -38,8 +38,9 @@ public class QuestionnaireController {
     }
 
     @GetMapping("/questionnaires")
-    public List<QuestionnaireDto> listQuestionnaires() {
-        return questionnaireRepository.findByStatus("published")
+    public List<QuestionnaireDto> listQuestionnaires() 
+    {
+    	return questionnaireRepository.findByStatus("published")
                 .stream()
                 .map(q -> new QuestionnaireDto(q.getId().toString(), q.getName(), q.getVersion()))
                 .toList();

@@ -12,6 +12,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.UUID;
 
 @Component
@@ -31,10 +32,11 @@ public class StartupSeeder implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        // Mirrors the Python startup(): create upload directory
-        Files.createDirectories(props.getUploadDir());
+        // create upload directory
+    	Path uploaddirpath = props.getUploadDir();
+    	Files.createDirectories(uploaddirpath);
 
-        // Mirrors ensure_admin_seed() in Python backend
+        //  ensure_admin_seed() 
         String adminEmail = props.getAdminEmail().trim().toLowerCase();
         boolean exists = userRepository.findByEmail(adminEmail).isPresent();
         if (!exists) {

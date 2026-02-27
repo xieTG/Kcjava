@@ -7,9 +7,9 @@ spring:
       max-file-size: 15MB
       max-request-size: 15MB
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/qst}
-    username: ${SPRING_DATASOURCE_USERNAME:qst_app}
-    password: ${SPRING_DATASOURCE_PASSWORD:qst_app_pwd}
+    url: jdbc:postgresql://localhost:5432/qst
+    username: qst_app
+    password: qst_app_pwd
   jpa:
     hibernate:
       ddl-auto: none
@@ -26,8 +26,8 @@ springdoc:
     path: /openapi
 
 app:
-  jwtSecret: ${JWT_SECRET:dev_secret_change_me}
-  adminEmail: ${ADMIN_EMAIL:admin@example.com}
-  adminPassword: ${ADMIN_PASSWORD:admin123}
-  uploadDir: ${UPLOAD_DIR:/data/uploads}
-  corsOrigins: ${CORS_ORIGINS:http://localhost:3000}
+  jwtSecret: dev_secret_change_me
+  adminEmail: admin@example.com
+  adminPassword: admin123
+  uploadDir: ./data/uploads
+  cors-origins: http://localhost:5173
