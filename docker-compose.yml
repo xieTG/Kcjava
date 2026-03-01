@@ -10,13 +10,37 @@ services:
       - "5432:5432"
     volumes:
       - qst_pgdata:/var/lib/postgresql/data
-      - ./infra/postgres/schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+      - ./infra/postgres:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U qst_app -d qst"]
       interval: 5s
       timeout: 5s
       retries: 20
+    # Common to both envs → no profile so it's always available
 
+  # ---- DEV ONLY ----
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase
+    environment:
+      MB_DB_FILE: /metabase-data/metabase.db
+      # Optional: if you want Metabase to use Postgres as its internal DB instead of H2:
+      # MB_DB_TYPE: postgres
+      # MB_DB_DBNAME: qst
+      # MB_DB_PORT: 5432
+      # MB_DB_USER: qst_app
+      # MB_DB_PASS: qst_app_pwd
+      # MB_DB_HOST: postgres
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - metabase_data:/metabase-data
+    profiles: ["dev"]
+
+  # ---- PROD ONLY ----
   backend:
     build: ./backend-spring
     container_name: qst_backend
@@ -27,8 +51,6 @@ services:
       SPRING_DATASOURCE_USERNAME: qst_app
       SPRING_DATASOURCE_PASSWORD: qst_app_pwd
       UPLOAD_DIR: /data/uploads
-      # Optional (already default):
-      # CORS_ORIGINS: http://localhost:3000
     volumes:
       - qst_uploads:/data/uploads
     ports:
@@ -36,6 +58,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    profiles: ["prod"]
 
   frontend:
     build: ./frontend
@@ -44,7 +67,9 @@ services:
       - "3000:80"
     depends_on:
       - backend
+    profiles: ["prod"]
 
 volumes:
   qst_pgdata:
   qst_uploads:
+  metabase_data:

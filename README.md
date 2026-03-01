@@ -11,6 +11,28 @@ It keeps the **same HTTP API** so the existing React frontend (proxied through N
 - `GET /me/submissions` (requires token)
 - `GET /health`
 
+# Dev: clean logs and start postgres + metabase (with your profiles)
+make start PROFILE=dev
+
+# Prod: clean logs and start postgres + backend + frontend
+make start PROFILE=prod
+
+# Stop containers for the selected profile
+make stop PROFILE=dev
+# or
+make stop PROFILE=prod
+
+
+# Reset DB in dev (drops volume, re-runs schema.sql, restarts)
+make reset-db PROFILE=dev
+
+# Reset DB in prod (be careful!)
+make reset-db PROFILE=prod
+
+# If auto-detection fails (custom names), pass the exact volume name:
+make reset-db PROFILE=dev VOL=kcjava_qst_pgdata
+
+
 ## Run with Docker
 
 1) Create a `.env` file (or copy `.env.example`):
