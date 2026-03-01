@@ -19,6 +19,9 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+
+
+
 CREATE TABLE IF NOT EXISTS questionnaires (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
@@ -48,7 +51,30 @@ CREATE TABLE IF NOT EXISTS answers (
   normalized_json JSONB
 );
 
--- Seed 1 questionnaire pour MVP
-INSERT INTO questionnaires (name, version, status)
-VALUES ('MVP Questionnaire', 1, 'published')
-ON CONFLICT (name, version) DO NOTHING;
+CREATE TABLE IF NOT EXISTS questions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  questionnaire_id UUID NOT NULL REFERENCES questionnaires(id),
+  question_category TEXT NOT NULL,
+  question_index TEXT NOT NULL,
+  question_text TEXT NOT NULL,
+  question_type TEXT NOT NULL, /*Text||Numeric||percentage||boolean||comment||choices*/
+  question_help TEXT 
+);
+
+CREATE TABLE IF NOT EXISTS choices (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  question_id UUID NOT NULL REFERENCES questions(id),
+  question_text TEXT NOT NULL,
+  question_type TEXT NOT NULL /*Text||Numeric||percentage||boolean*/
+ 
+);
+
+CREATE TABLE IF NOT EXISTS LC (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT UNIQUE NOT NULL,
+  description TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  questionnaires_id UUID REFERENCES questionnaires(id) ON DELETE CASCADE
+);
+
+
