@@ -3,6 +3,7 @@ package com.xietg.kc.service;
 import com.xietg.kc.config.AppProperties;
 import com.xietg.kc.db.entity.*;
 import com.xietg.kc.db.repo.AnswerRepository;
+import com.xietg.kc.db.repo.LCRepository;
 import com.xietg.kc.db.repo.QuestionRepository;
 import com.xietg.kc.db.repo.QuestionnaireRepository;
 import com.xietg.kc.db.repo.SubmissionRepository;
@@ -27,27 +28,51 @@ public class SubmissionService {
 
 	private final AppProperties props;
 	private final QuestionnaireRepository questionnaireRepository;
+	private final LCRepository lcRepository;
 	private final SubmissionRepository submissionRepository;
 	private final QuestionRepository questionRepository;
 	private final ExcelParser excelParser;
 
 	public SubmissionService(	AppProperties props,
 			QuestionnaireRepository questionnaireRepository,
+			LCRepository lcRepository,
 			SubmissionRepository submissionRepository,
 			QuestionRepository questionRepository,
 			ExcelParser excelParser) {
 		this.props = props;
 		this.questionnaireRepository = questionnaireRepository;
+		this.lcRepository = lcRepository;
 		this.submissionRepository = submissionRepository;
 		this.questionRepository = questionRepository;
 		this.excelParser = excelParser;
 	}
 
 	@Transactional(noRollbackFor = ApiException.class)
-	public SubmissionResult createSubmission(UUID questionnaireId, UserEntity user, MultipartFile file) {
+	public SubmissionResult createSubmission( LCEntity lc , UserEntity user, MultipartFile file) {
 
-		QuestionnaireEntity q = questionnaireRepository.findById(questionnaireId)
-				.orElseThrow(() -> ApiException.notFound("Questionnaire not found"));
+		    	
+		QuestionnaireEntity questionnaire = new QuestionnaireEntity();
+					
+		if(lc.getQuestionnaireId()==null)
+		{
+			//We must create the questionnaire in the DB
+			UUID id = UUID.randomUUID();
+			questionnaire = new QuestionnaireEntity();
+			questionnaire.setId(id);
+			questionnaire.setName("Name for"+id.toString());
+			questionnaire.setVersion(0);
+			questionnaireRepository.save(questionnaire);
+			
+			lc.setQuestionnaireId(id);
+			lcRepository.save(lc);
+			
+		}
+		else
+		{
+			Optional<QuestionnaireEntity> q = questionnaireRepository.findById(lc.getQuestionnaireId());
+			questionnaire=q.get();
+		}
+		
 
 		if (file == null || file.isEmpty()) {
 			throw ApiException.badRequest("Missing file");
@@ -69,7 +94,7 @@ public class SubmissionService {
 		// Create submission record first (status=received)
 		SubmissionEntity submission = new SubmissionEntity();
 		submission.setId(submissionId);
-		submission.setQuestionnaireId(q.getId());
+		submission.setQuestionnaireId(questionnaire.getId());
 		submission.setUserId(user.getId());
 		submission.setUploadedFileKey(storedKey);
 		submission.setStatus(SubmissionStatus.received);
@@ -80,7 +105,7 @@ public class SubmissionService {
 			file.transferTo(dest);
 
 			// Parse Standard and Tech question tab to get the full question list
-			List<QuestionEntity> questionsList = excelParser.parseQuestionsXlsx(questionnaireId,dest,"4. Standard Questions","5. Technical Questions");
+			List<QuestionEntity> questionsList = excelParser.parseQuestionsXlsx(questionnaire.getId(),dest,"4. Standard Questions","5. Technical Questions");
 			questionRepository.saveAll(questionsList);
 
 			//Confirm parsing is OK
@@ -88,6 +113,7 @@ public class SubmissionService {
 			submission.setParsedAt(OffsetDateTime.now(ZoneOffset.UTC));
 			submission.setErrorJson(null);
 			submissionRepository.save(submission);
+
 
 			return new SubmissionResult(submissionId, submission.getStatus().name());
 

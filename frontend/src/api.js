@@ -1,42 +1,80 @@
 const API_BASE = "/api";
 
-export async function login(email, password) {
-  const res = await fetch(`${API_BASE}/auth/login`, {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ email, password }),
+async function request(path, { method = "GET", token, headers, body } = {}) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(body && !(body instanceof FormData) ? { "Content-Type": "application/json" } : {}),
+      ...(headers || {}),
+    },
+    body: body
+      ? body instanceof FormData
+        ? body
+        : JSON.stringify(body)
+      : undefined,
   });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+
+  const text = await res.text();
+  if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+
+  // try json, fallback to text
+  try {
+    return text ? JSON.parse(text) : null;
+  } catch {
+    return text;
+  }
 }
 
-export async function listQuestionnaires() {
-  const res = await fetch(`${API_BASE}/questionnaires`);
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+export function templateUrl(questionnaireId) {
+  return `${API_BASE}/questionnaires/${questionnaireId}/template`;
 }
 
-export async function uploadSubmission(qid, file, token) {
+// Specific endpoints (nice for the console)
+export function apiHealth() {
+  return request("/health");
+}
+
+export function apiLogin(email, password) {
+  return request("/auth/login", { method: "POST", body: { email, password } });
+}
+
+//Return the list of LC for the dropdown menu in the submission form
+export function apiListLC(token) {
+  return request("/LC", { token }); 
+}
+
+//Create a new LC with the name and description provided in the form
+export function apiCreateLC(token, { name, description }) {
+  return request("/LC", { method: "POST", token, body: { name, description } });
+}
+
+// Return the list of questionnaires
+export function apiListQuestionnaires(token) {
+  return request("/questionnaires", { token });
+}
+
+// Return the list of submissions for the logged in user
+export function apiMySubmissions(token) {
+  return request("/me/submissions", { token });
+}
+
+// Upload a submission file for a specific questionnaire
+export function apiUploadSubmission(questionnaireId, file, token) {
   const fd = new FormData();
   fd.append("file", file);
-  const res = await fetch(`${API_BASE}/questionnaires/${qid}/submissions`, {
+  return request(`/questionnaires/${questionnaireId}/submissions`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
+    token,
     body: fd,
   });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
 }
 
-export async function mySubmissions(token) {
-  const res = await fetch(`${API_BASE}/me/submissions`, {
-    headers: { Authorization: `Bearer ${token}` },
+// For the “Custom request” box
+export function apiCustom(path, { method, token, jsonBody } = {}) {
+  return request(path.startsWith("/") ? path : `/${path}`, {
+    method,
+    token,
+    body: jsonBody,
   });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
 }
-
-export function templateUrl(qid) {
-  return `${API_BASE}/questionnaires/${qid}/template`;
-}
-

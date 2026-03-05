@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-public class MeController {
-
+public class SubmissionController {
+//TODO: rename into SubmissionController
     private final AuthService authService;
     private final SubmissionRepository submissionRepository;
 
-    public MeController(AuthService authService, SubmissionRepository submissionRepository) {
+    public SubmissionController(AuthService authService, SubmissionRepository submissionRepository) {
         this.authService = authService;
         this.submissionRepository = submissionRepository;
     }

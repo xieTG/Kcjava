@@ -58,7 +58,7 @@ public class ExcelParser {
 
             int lastRow = ws.getLastRowNum();
             
-            Log.logs("Number of row: " +lastRow);
+            Log.debug("Number of row in "+tabName+" : " +lastRow);
                      
             
             
@@ -114,7 +114,7 @@ public class ExcelParser {
                 	questionText = cell2;
                     questionType = cell3;
                     questionHelp = cell4;
-                    Log.logs(questionCategory+" "+questionIndex+" "+questionText+" "+questionType+" "+questionHelp);
+                    Log.debug(questionCategory+" "+questionIndex+" "+questionText+" "+questionType+" "+questionHelp);
                     i++;
                 }
                 else
@@ -124,7 +124,7 @@ public class ExcelParser {
                     questionText = cell2;
                     questionType = cell3;
                     questionHelp = cell4;
-                    Log.logs(questionCategory+" "+questionIndex+" "+questionText+" "+questionType+" "+questionHelp);
+                    Log.debug(questionCategory+" "+questionIndex+" "+questionText+" "+questionType+" "+questionHelp);
                     i=0;
                 }
                              

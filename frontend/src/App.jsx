@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Login from "./pages/Login.jsx";
-import Upload from "./pages/Upload.jsx";
+import ApiConsole from "./pages/ApiConsole.jsx";
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem("token") || "");
@@ -21,18 +21,21 @@ export default function App() {
   }
 
   return (
-    <div style={{ fontFamily: "system-ui", maxWidth: 900, margin: "40px auto", padding: 16 }}>
+    <div style={{ maxWidth: 900, margin: "24px auto", padding: 16, fontFamily: "system-ui" }}>
       <h1>Questionnaire MVP</h1>
+
       {!token ? (
         <Login onLogin={onLogin} />
       ) : (
         <>
-          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>Connecté: <b>{role}</b></div>
             <button onClick={logout}>Logout</button>
           </div>
-          <hr />
-          <Upload token={token} />
+
+          <hr style={{ margin: "16px 0" }} />
+
+          <ApiConsole token={token} />
         </>
       )}
     </div>

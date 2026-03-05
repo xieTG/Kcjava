@@ -1,13 +1,17 @@
 package com.xietg.kc.controller;
 
+import com.xietg.kc.db.entity.LCEntity;
 import com.xietg.kc.db.entity.QuestionnaireEntity;
+import com.xietg.kc.db.entity.SubmissionStatus;
 import com.xietg.kc.db.entity.UserEntity;
+import com.xietg.kc.db.repo.LCRepository;
 import com.xietg.kc.db.repo.QuestionnaireRepository;
 import com.xietg.kc.error.ApiException;
 import com.xietg.kc.excel.TemplateBuilder;
 import com.xietg.kc.security.AuthService;
 import com.xietg.kc.service.SubmissionService;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,17 +25,20 @@ import java.util.UUID;
 public class QuestionnaireController {
 
     private final QuestionnaireRepository questionnaireRepository;
+    private final LCRepository lcRepository;
     private final TemplateBuilder templateBuilder;
     private final AuthService authService;
     private final SubmissionService submissionService;
 
     public QuestionnaireController(
             QuestionnaireRepository questionnaireRepository,
+            LCRepository lcRepository,
             TemplateBuilder templateBuilder,
             AuthService authService,
             SubmissionService submissionService
     ) {
         this.questionnaireRepository = questionnaireRepository;
+        this.lcRepository = lcRepository;
         this.templateBuilder = templateBuilder;
         this.authService = authService;
         this.submissionService = submissionService;
@@ -46,8 +53,10 @@ public class QuestionnaireController {
                 .toList();
     }
 
-    @GetMapping("/questionnaires/{questionnaireId}/template")
+    @GetMapping("/questionnaires/{LCId}/template")
     public ResponseEntity<byte[]> downloadTemplate(@PathVariable UUID questionnaireId) {
+    	//TODO: Change questionnaireId into lcId. We should be able to download the questionnaire for an LC. If no questionnaire -> return error
+    	
         QuestionnaireEntity q = questionnaireRepository.findById(questionnaireId)
                 .orElseThrow(() -> ApiException.notFound("Questionnaire not found"));
 
@@ -60,14 +69,20 @@ public class QuestionnaireController {
                 .body(bytes);
     }
 
-    @PostMapping(value = "/questionnaires/{questionnaireId}/submissions", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/questionnaires/{lcId}/submissions", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public SubmissionResponse uploadSubmission(
-            @PathVariable UUID questionnaireId,
+            @PathVariable UUID lcId,
             @RequestPart("file") MultipartFile file,
             @RequestHeader(value = "Authorization", required = false) String authorization
     ) {
         UserEntity user = authService.requireUser(authorization);
-        SubmissionService.SubmissionResult result = submissionService.createSubmission(questionnaireId, user, file);
+        
+        //1- Check if the LC as already a questionnnaire
+        LCEntity lc = lcRepository.findById(lcId).orElseThrow(() -> ApiException.notFound("LC not found"));
+        
+        
+        //Set or update questionnaire
+        SubmissionService.SubmissionResult result = submissionService.createSubmission(lc, user, file);
         return new SubmissionResponse(result.submissionId().toString(), result.status());
     }
 
