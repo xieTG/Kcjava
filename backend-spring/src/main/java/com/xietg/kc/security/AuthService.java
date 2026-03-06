@@ -2,7 +2,7 @@ package com.xietg.kc.security;
 
 import com.xietg.kc.db.entity.UserEntity;
 import com.xietg.kc.db.repo.UserRepository;
-import com.xietg.kc.error.ApiException;
+import com.xietg.kc.error.BusinessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -20,16 +20,16 @@ public class AuthService {
     public UserEntity requireUser(String authorizationHeader) {
         String token = bearerToken(authorizationHeader);
         if (token == null) {
-            throw new ApiException(HttpStatus.UNAUTHORIZED, "Missing token");
+            throw new BusinessException(HttpStatus.UNAUTHORIZED, "Missing token");
         }
 
         JwtService.JwtPayload payload = jwtService.decodeToken(token);
         if (payload.subject() == null || payload.subject().isBlank()) {
-            throw new ApiException(HttpStatus.UNAUTHORIZED, "Invalid token");
+            throw new BusinessException(HttpStatus.UNAUTHORIZED, "Invalid token");
         }
 
         return userRepository.findByEmail(payload.subject().trim().toLowerCase())
-                .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Unknown user"));
+                .orElseThrow(() -> new BusinessException(HttpStatus.UNAUTHORIZED, "Unknown user"));
     }
 
     private String bearerToken(String authorizationHeader) {

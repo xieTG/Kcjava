@@ -4,7 +4,6 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
-import com.xietg.kc.db.entity.AnswerEntity;
 import com.xietg.kc.db.entity.QuestionEntity;
 import com.xietg.kc.log.*;
 
@@ -107,9 +106,9 @@ public class ExcelParser {
                 	questionIndex = null;
                     subquestionIndex=null;
                 }
-                else if(cell1 == "" && cell4=="")
+                else if(cell1 == "")
                 {
-                	
+                	// we are in a subquestion
                 	questionIndex= subquestionIndex + "abcdefghijklmnopqrstuvwxyz".charAt(i)+")";
                 	questionText = cell2;
                     questionType = cell3;
@@ -133,6 +132,7 @@ public class ExcelParser {
                 {
 	                QuestionEntity q = new QuestionEntity();
 	                q.setId(UUID.randomUUID());
+	                q.setTab(tabName);
 	                q.setQuestionnaireId(questionnaireId);
 	                q.setIndex(questionIndex);
 	                q.setText(questionText);

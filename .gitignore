@@ -34,3 +34,6 @@ frontend/.DS_Store
 node_modules/
 dist/
 
+# local uploads / generated files
+backend-spring/data/uploads/
+

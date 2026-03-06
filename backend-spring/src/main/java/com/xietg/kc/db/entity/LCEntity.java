@@ -27,13 +27,16 @@ public class LCEntity {
     private UUID id;
 
     @Column(nullable = true)
-    private UUID questionnaires_id;
+    private UUID questionnaire_id;
 
     @Column(nullable = false)
     private String name;
 
     @Column(nullable = false)
     private String description;
+    
+    @Column(nullable = false)
+    private Integer year = 2026;
 
 
 
@@ -53,11 +56,11 @@ public class LCEntity {
     }
     
     public UUID getQuestionnaireId() {
-    	return questionnaires_id;
+    	return questionnaire_id;
     }
     
     public void setQuestionnaireId(UUID id) {
-    	this.questionnaires_id =id;
+    	this.questionnaire_id =id;
     }
 
     public String getName() {
@@ -76,6 +79,13 @@ public class LCEntity {
         this.description = description;
     }
 
+	public Integer getYear() {
+		return this.year;
+	}
+
+	public void setYear(Integer year) {
+		this.year=year;
+	}
     
 
 }

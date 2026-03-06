@@ -15,20 +15,90 @@ async function request(path, { method = "GET", token, headers, body } = {}) {
       : undefined,
   });
 
-  const text = await res.text();
-  if (!res.ok) throw new Error(text || `HTTP ${res.status}`);
+  const contentType = res.headers.get("content-type") || "";
+  const isJson = contentType.includes("application/json") || contentType.includes("application/problem+json");
 
-  // try json, fallback to text
+  const payload = isJson ? await res.json().catch(() => null) : await res.text().catch(() => null);
+
+  if (!res.ok) {
+    // throw structured info React can use
+    const err = new Error(payload?.detail || payload || `HTTP ${res.status}`);
+    err.status = res.status;
+    err.code = payload?.code;
+    err.params = payload?.params;
+    err.problem = payload;
+    throw err;
+  }
+
+  return payload;
+}
+
+// --- NEW: binary download helper (Blob) ---
+function extractFilenameFromContentDisposition(contentDisposition) {
+  if (!contentDisposition) return null;
+
+  // supports: filename="x.xlsx" and filename*=UTF-8''x.xlsx
+  const match = contentDisposition.match(/filename\*?=(?:UTF-8'')?["']?([^"';]+)["']?/i);
+  if (!match?.[1]) return null;
+
   try {
-    return text ? JSON.parse(text) : null;
+    return decodeURIComponent(match[1]);
   } catch {
-    return text;
+    return match[1];
   }
 }
 
-export function templateUrl(questionnaireId) {
-  return `${API_BASE}/questionnaires/${questionnaireId}/template`;
+async function downloadAsFile(
+  path,
+  { token, method = "GET", headers, defaultFilename = "download.xlsx" } = {}
+) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(headers || {}),
+    },
+  });
+
+  // ✅ If error: read body as JSON (problem+json) or text, then throw
+  if (!res.ok) {
+    const contentType = res.headers.get("content-type") || "";
+    const isJson =
+      contentType.includes("application/json") ||
+      contentType.includes("application/problem+json");
+
+    const payload = isJson
+      ? await res.json().catch(() => null)
+      : await res.text().catch(() => null);
+
+    const err = new Error(payload?.detail || payload || `HTTP ${res.status}`);
+    err.status = res.status;
+    err.code = payload?.code;
+    err.params = payload?.params;
+    err.problem = payload;
+    throw err;
+  }
+
+  // ✅ Success: read as Blob ONCE
+  const blob = await res.blob();
+
+  const cd = res.headers.get("content-disposition");
+  const filename = extractFilenameFromContentDisposition(cd) || defaultFilename;
+
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+
+  return { filename };
 }
+
+
+
 
 // Specific endpoints (nice for the console)
 export function apiHealth() {
@@ -41,12 +111,12 @@ export function apiLogin(email, password) {
 
 //Return the list of LC for the dropdown menu in the submission form
 export function apiListLC(token) {
-  return request("/LC", { token }); 
+  return request("/lcs", { token }); 
 }
 
 //Create a new LC with the name and description provided in the form
-export function apiCreateLC(token, { name, description }) {
-  return request("/LC", { method: "POST", token, body: { name, description } });
+export function apiCreateLC(token, { name, year, description }) {
+  return request("/lcs", { method: "POST", token, body: { name, year, description } });
 }
 
 // Return the list of questionnaires
@@ -55,18 +125,26 @@ export function apiListQuestionnaires(token) {
 }
 
 // Return the list of submissions for the logged in user
-export function apiMySubmissions(token) {
-  return request("/me/submissions", { token });
+export function apiMyUploads(token) {
+  return request("/submissions", { token });
 }
 
-// Upload a submission file for a specific questionnaire
-export function apiUploadSubmission(questionnaireId, file, token) {
+// Upload a questionnaire file for a specific LC
+export function apiUploadLCQuestionnaire(lcID, file, token) {
   const fd = new FormData();
   fd.append("file", file);
-  return request(`/questionnaires/${questionnaireId}/submissions`, {
+  return request(`/lcs/${lcID}/submissions`, {
     method: "POST",
     token,
     body: fd,
+  });
+}
+
+// Download a questionnaire template (Excel) for a specific LC
+export function apiDownloadLCQuestionnaire(lcId, token) {
+  return downloadAsFile(`/lcs/${lcId}/xlsx`, {
+    token,
+    defaultFilename: `template-${lcId}.xlsx`,
   });
 }
 

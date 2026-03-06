@@ -5,19 +5,9 @@ import jakarta.persistence.*;
 
 import java.util.UUID;
 
-@Entity
+@Entity(name = "questions")
 @Table(name = "questions")
 
-/**
-id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  questionnaire_id UUID NOT NULL REFERENCES questionnaires(id),
-  question_category TEXT NOT NULL,
-  question_index TEXT NOT NULL,
-  question_text TEXT NOT NULL,
-  question_type TEXT NOT NULL, // Text||Numeric||percentage||boolean||comment||choices
-  question_help TEXT 
-
-*/
 public class QuestionEntity {
 	
 	@Id
@@ -26,6 +16,9 @@ public class QuestionEntity {
 
     @Column(nullable = false)
     private UUID questionnaire_id;
+    
+    @Column(nullable = false)
+    private String question_tab;
 
     @Column(nullable = false)
     private String question_category;
@@ -60,7 +53,13 @@ public class QuestionEntity {
     public void setQuestionnaireId(UUID id) {
     	this.questionnaire_id =id;
     }
+    public String getTab() {
+        return question_tab;
+    }
 
+    public void setTab(String question_tab) {
+        this.question_tab = question_tab;
+    }
     public String getCategory() {
         return question_category;
     }

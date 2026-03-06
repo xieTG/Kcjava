@@ -16,11 +16,9 @@ CREATE TABLE IF NOT EXISTS users (
   email TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
   role user_role NOT NULL DEFAULT 'user',
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
-
-
-
 
 CREATE TABLE IF NOT EXISTS questionnaires (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -29,31 +27,16 @@ CREATE TABLE IF NOT EXISTS questionnaires (
   status TEXT NOT NULL DEFAULT 'published',
   template_file_key TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  UNIQUE(name, version)
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS submissions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  questionnaire_id UUID NOT NULL REFERENCES questionnaires(id),
-  user_id UUID NOT NULL REFERENCES users(id),
-  uploaded_file_key TEXT,
-  status submission_status NOT NULL DEFAULT 'received',
-  submitted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  parsed_at TIMESTAMPTZ,
-  error_json JSONB
-);
 
-CREATE TABLE IF NOT EXISTS answers (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  submission_id UUID NOT NULL REFERENCES submissions(id) ON DELETE CASCADE,
-  question_id TEXT NOT NULL,
-  raw_answer TEXT,
-  normalized_json JSONB
-);
+
 
 CREATE TABLE IF NOT EXISTS questions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   questionnaire_id UUID NOT NULL REFERENCES questionnaires(id),
+  question_tab TEXT NOT NULL,
   question_category TEXT NOT NULL,
   question_index TEXT NOT NULL,
   question_text TEXT NOT NULL,
@@ -71,10 +54,32 @@ CREATE TABLE IF NOT EXISTS choices (
 
 CREATE TABLE IF NOT EXISTS LC (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
   description TEXT NOT NULL,
+  year INT NOT NULL DEFAULT 2026,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  questionnaires_id UUID REFERENCES questionnaires(id) ON DELETE CASCADE
+  questionnaire_id UUID REFERENCES questionnaires(id) ON DELETE CASCADE,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE(name, year)
+);
+
+CREATE TABLE IF NOT EXISTS submissions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  lc_id UUID NOT NULL REFERENCES LC(id),
+  user_id UUID NOT NULL REFERENCES users(id),
+  uploaded_file_key TEXT,
+  status submission_status NOT NULL DEFAULT 'received',
+  submitted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  parsed_at TIMESTAMPTZ,
+  error_json JSONB
+);
+
+CREATE TABLE IF NOT EXISTS answers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  submission_id UUID NOT NULL REFERENCES submissions(id) ON DELETE CASCADE,
+  question_id TEXT NOT NULL,
+  raw_answer TEXT,
+  normalized_json JSONB
 );
 
 

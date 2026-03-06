@@ -2,14 +2,9 @@ package com.xietg.kc.service;
 
 import com.xietg.kc.config.AppProperties;
 import com.xietg.kc.db.entity.*;
-import com.xietg.kc.db.repo.AnswerRepository;
-import com.xietg.kc.db.repo.LCRepository;
-import com.xietg.kc.db.repo.QuestionRepository;
-import com.xietg.kc.db.repo.QuestionnaireRepository;
-import com.xietg.kc.db.repo.SubmissionRepository;
-import com.xietg.kc.error.ApiException;
-import com.xietg.kc.excel.ExcelParseException;
-import com.xietg.kc.excel.ExcelParser;
+import com.xietg.kc.db.repo.*;
+import com.xietg.kc.error.BusinessException;
+import com.xietg.kc.excel.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +42,7 @@ public class SubmissionService {
 		this.excelParser = excelParser;
 	}
 
-	@Transactional(noRollbackFor = ApiException.class)
+	@Transactional(noRollbackFor = BusinessException.class)
 	public SubmissionResult createSubmission( LCEntity lc , UserEntity user, MultipartFile file) {
 
 		    	
@@ -75,16 +70,16 @@ public class SubmissionService {
 		
 
 		if (file == null || file.isEmpty()) {
-			throw ApiException.badRequest("Missing file");
+			throw BusinessException.badRequest("Missing file");
 		}
 
 		String filename = Optional.ofNullable(file.getOriginalFilename()).orElse("");
 		if (!filename.toLowerCase(Locale.ROOT).endsWith(".xlsx")) {
-			throw ApiException.badRequest("Only .xlsx files are supported");
+			throw BusinessException.badRequest("Only .xlsx files are supported");
 		}
 
 		if (file.getSize() > MAX_XLSX_BYTES) {
-			throw ApiException.badRequest("File too large (max 15MB)");
+			throw BusinessException.badRequest("File too large (max 15MB)");
 		}
 
 		UUID submissionId = UUID.randomUUID();
@@ -94,7 +89,7 @@ public class SubmissionService {
 		// Create submission record first (status=received)
 		SubmissionEntity submission = new SubmissionEntity();
 		submission.setId(submissionId);
-		submission.setQuestionnaireId(questionnaire.getId());
+		submission.setLCId(lc.getId());
 		submission.setUserId(user.getId());
 		submission.setUploadedFileKey(storedKey);
 		submission.setStatus(SubmissionStatus.received);
@@ -123,9 +118,9 @@ public class SubmissionService {
 			submission.setErrorJson(Map.of("error", e.getMessage()));
 			submissionRepository.save(submission);
 
-			throw new ApiException(HttpStatus.BAD_REQUEST, "Excel parse error: " + e.getMessage());
+			throw new BusinessException(HttpStatus.BAD_REQUEST, "Excel parse error: " + e.getMessage());
 
-		} catch (ApiException e) {
+		} catch (BusinessException e) {
 			// Make sure we don't leave a dangling submission for request validation errors.
 			// Here, ApiException could still happen; we keep behavior explicit.
 			throw e;
@@ -137,7 +132,7 @@ public class SubmissionService {
 			submission.setErrorJson(Map.of("error", "Internal error"));
 			submissionRepository.save(submission);
 
-			throw new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal error");
+			throw new BusinessException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal error");
 		}
 	}
 

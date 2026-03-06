@@ -6,7 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.xietg.kc.config.AppProperties;
-import com.xietg.kc.error.ApiException;
+import com.xietg.kc.error.BusinessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -41,9 +41,9 @@ public class JwtService {
             String role = jwt.getClaim("role").asString();
             return new JwtPayload(email, role);
         } catch (TokenExpiredException e) {
-            throw new ApiException(HttpStatus.UNAUTHORIZED, "Token expired");
+            throw new BusinessException(HttpStatus.UNAUTHORIZED, "Token expired");
         } catch (Exception e) {
-            throw new ApiException(HttpStatus.UNAUTHORIZED, "Invalid token");
+            throw new BusinessException(HttpStatus.UNAUTHORIZED, "Invalid token");
         }
     }
 

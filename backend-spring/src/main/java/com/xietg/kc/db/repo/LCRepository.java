@@ -12,4 +12,6 @@ import com.xietg.kc.db.entity.LCEntity;
 
 public interface LCRepository extends JpaRepository<LCEntity, UUID> {
     List<LCEntity> findByName(String name);
+    
+    List<LCEntity> findByNameAndYear(String name, Integer year);
 }

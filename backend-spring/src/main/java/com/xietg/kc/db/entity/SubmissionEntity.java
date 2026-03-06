@@ -17,8 +17,8 @@ public class SubmissionEntity {
     @Column(columnDefinition = "uuid")
     private UUID id;
 
-    @Column(name = "questionnaire_id", nullable = false, columnDefinition = "uuid")
-    private UUID questionnaireId;
+    @Column(name = "lc_id", nullable = false, columnDefinition = "uuid")
+    private UUID lcId;
 
     @Column(name = "user_id", nullable = false, columnDefinition = "uuid")
     private UUID userId;
@@ -60,12 +60,12 @@ public class SubmissionEntity {
         this.id = id;
     }
 
-    public UUID getQuestionnaireId() {
-        return questionnaireId;
+    public UUID getLCId() {
+        return lcId;
     }
 
-    public void setQuestionnaireId(UUID questionnaireId) {
-        this.questionnaireId = questionnaireId;
+    public void setLCId(UUID lcId) {
+        this.lcId = lcId;
     }
 
     public UUID getUserId() {
