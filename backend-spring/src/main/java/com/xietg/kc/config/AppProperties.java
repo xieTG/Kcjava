@@ -26,7 +26,7 @@ public class AppProperties {
      * Comma-separated list of allowed CORS origins.
      * Example: "http://localhost:3000,http://127.0.0.1:3000"
      */
-    private String corsOrigins;
+    private String corsOrigins="";
 
     public String getJwtSecret() {
         return jwtSecret;

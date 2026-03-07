@@ -11,24 +11,26 @@ import java.util.stream.Collectors;
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
 
-    private final AppProperties props;
+	private final AppProperties props;
 
-    public CorsConfig(AppProperties props) {
-        this.props = props;
-    }
+	public CorsConfig(AppProperties props) {
+		this.props = props;
+	}
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        List<String> origins = Arrays.stream(props.getCorsOrigins().split(","))
-                .map(String::trim)
-                .filter(s -> !s.isBlank())
-                .collect(Collectors.toList());
+	@Override
+	public void addCorsMappings(CorsRegistry registry) {
+		String rawOrigins = props.getCorsOrigins() == null ? "" : props.getCorsOrigins();
 
-        // Mirrors the Python backend: allow origins from local frontend dev
-        registry.addMapping("/**")
-                .allowedOrigins(origins.toArray(new String[0]))
-                .allowedMethods("*")
-                .allowedHeaders("*")
-                .allowCredentials(true);
-    }
+		List<String> origins = Arrays.stream(rawOrigins.split(","))
+				.map(String::trim)
+				.filter(s -> !s.isBlank())
+				.collect(Collectors.toList());
+
+		// Mirrors the Python backend: allow origins from local frontend dev
+		registry.addMapping("/**")
+		.allowedOrigins(origins.toArray(new String[0]))
+		.allowedMethods("*")
+		.allowedHeaders("*")
+		.allowCredentials(true);
+	}
 }
