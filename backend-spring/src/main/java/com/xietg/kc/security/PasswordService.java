@@ -11,7 +11,6 @@ public class PasswordService {
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     public String hashPassword(String rawPassword) {
-    	Log.debug(rawPassword);
         return encoder.encode(rawPassword);
     }
 
