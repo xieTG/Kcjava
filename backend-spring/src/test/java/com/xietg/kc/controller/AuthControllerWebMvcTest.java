@@ -6,6 +6,7 @@ import com.xietg.kc.db.repo.UserRepository;
 import com.xietg.kc.security.JwtService;
 import com.xietg.kc.security.PasswordService;
 import org.junit.jupiter.api.Test;
+import com.xietg.kc.config.AppProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -20,7 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AuthController.class)
+@WebMvcTest(value = AuthController.class, properties = "app.cors-origins=http://localhost:3000")
 class AuthControllerWebMvcTest {
 
     @Autowired
@@ -35,8 +36,16 @@ class AuthControllerWebMvcTest {
     @MockitoBean
     JwtService jwtService;
 
+    @MockitoBean
+    AppProperties appProperties;
+    
+    
+    
     @Test
     void login_should_return_token_and_role() throws Exception {
+    	
+    	when(appProperties.getCorsOrigins()).thenReturn("http://localhost:3000");
+    	
         UserEntity user = new UserEntity();
         user.setEmail("admin@example.com");
         user.setPasswordHash("hashed");
