@@ -26,9 +26,6 @@ class AuthControllerWebMvcTest {
     @Autowired
     MockMvc mvc;
 
-    @Autowired
-    ObjectMapper objectMapper;
-
     @MockitoBean
     UserRepository userRepository;
 
