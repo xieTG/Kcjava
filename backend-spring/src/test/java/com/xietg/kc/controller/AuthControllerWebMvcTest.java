@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 import java.util.Optional;
 
@@ -22,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = AuthController.class, properties = "app.cors-origins=http://localhost:3000")
+@EnableConfigurationProperties(AppProperties.class)
 class AuthControllerWebMvcTest {
 
     @Autowired
@@ -36,15 +38,11 @@ class AuthControllerWebMvcTest {
     @MockitoBean
     JwtService jwtService;
 
-    @MockitoBean
-    AppProperties appProperties;
-    
-    
     
     @Test
     void login_should_return_token_and_role() throws Exception {
     	
-    	when(appProperties.getCorsOrigins()).thenReturn("http://localhost:3000");
+    	
     	
         UserEntity user = new UserEntity();
         user.setEmail("admin@example.com");
