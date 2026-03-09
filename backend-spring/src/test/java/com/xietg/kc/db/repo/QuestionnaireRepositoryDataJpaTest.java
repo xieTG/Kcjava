@@ -13,10 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest(properties = {
-        "spring.test.database.replace=NONE",
-        "spring.jpa.hibernate.ddl-auto=create-drop",
-        "spring.sql.init.mode=never"
-})
+	    "spring.test.database.replace=NONE",
+	    "spring.jpa.hibernate.ddl-auto=none",    // laisser le SQL initialiser le schema
+	    "spring.sql.init.mode=always"            // exécute test-schema.sql (classpath:sql/test-schema.sql)
+	})
 class QuestionnaireRepositoryDataJpaTest extends AbstractPostgresIT {
 
     @Autowired
