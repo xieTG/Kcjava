@@ -1,14 +1,7 @@
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
-    CREATE TYPE user_role AS ENUM ('user','admin');
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'submission_status') THEN
-    CREATE TYPE submission_status AS ENUM (
-      'finalized','parse_error','parsed_ok','received','scored','scoring_in_progress'
-    );
-  END IF;
-END$$;
+-- safe-create-types at top of src/test/resources/sql/test-schema.sql
+CREATE TYPE IF NOT EXISTS user_role AS ENUM ('user','admin');
+
+CREATE TYPE IF NOT EXISTS submission_status AS ENUM ('finalized','parse_error','parsed_ok','received','scored','scoring_in_progress');
 
 CREATE TABLE questionnaires (
   id UUID PRIMARY KEY,
