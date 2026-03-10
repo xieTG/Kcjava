@@ -2,10 +2,10 @@ package com.xietg.kc.db.repo;
 
 import com.xietg.kc.db.entity.QuestionnaireEntity;
 import com.xietg.kc.integration.AbstractPostgresIT;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
     "spring.sql.init.mode=always",
     "spring.sql.init.schema-locations=classpath:sql/test-schema.sql"
 }, webEnvironment = SpringBootTest.WebEnvironment.NONE)
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Transactional
 class QuestionnaireRepositoryDataJpaTest extends AbstractPostgresIT {
 
