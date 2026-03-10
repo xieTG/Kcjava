@@ -1,8 +1,3 @@
--- safe-create-types at top of src/test/resources/sql/test-schema.sql
-CREATE TYPE IF NOT EXISTS user_role AS ENUM ('user','admin');
-
-CREATE TYPE IF NOT EXISTS submission_status AS ENUM ('finalized','parse_error','parsed_ok','received','scored','scoring_in_progress');
-
 CREATE TABLE questionnaires (
   id UUID PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
