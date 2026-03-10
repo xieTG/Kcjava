@@ -11,17 +11,17 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @ActiveProfiles("test")
 public abstract class AbstractPostgresIT {
 
-    @Container
-    static PostgreSQLContainer<?> postgres =
-            new PostgreSQLContainer<>("postgres:16-alpine")
-                    .withDatabaseName("kc_test")
-                    .withUsername("kc")
-                    .withPassword("kc");
+  @Container
+  public static final PostgreSQLContainer<?> POSTGRES =
+      new PostgreSQLContainer<>("postgres:16-alpine")
+          .withDatabaseName("kc_test")
+          .withUsername("kc")
+          .withPassword("kc");
 
-    @DynamicPropertySource
-    static void overrideProps(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-    }
+  @DynamicPropertySource
+  static void register(DynamicPropertyRegistry r) {
+      r.add("spring.datasource.url", POSTGRES::getJdbcUrl);
+      r.add("spring.datasource.username", POSTGRES::getUsername);
+      r.add("spring.datasource.password", POSTGRES::getPassword);
+  }
 }
