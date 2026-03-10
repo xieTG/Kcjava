@@ -1,7 +1,7 @@
 spring:
   datasource:
     hikari:
-      connection-timeout: 120000   # 120s
+      connection-timeout: 120000
       validation-timeout: 5000
       maximum-pool-size: 10
       max-lifetime: 300000
@@ -10,5 +10,5 @@ spring:
       ddl-auto: none
   sql:
     init:
-      mode: always
+      mode: never
       schema-locations: classpath:sql/test-schema.sql
