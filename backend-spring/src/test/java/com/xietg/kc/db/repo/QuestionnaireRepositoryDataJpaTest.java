@@ -4,9 +4,12 @@ import com.xietg.kc.db.entity.QuestionnaireEntity;
 import com.xietg.kc.integration.AbstractPostgresIT;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,14 +18,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ActiveProfiles("test")
-@Sql(scripts = "/sql/test-schema.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-
-@DataJpaTest(properties = {
-	    "spring.test.database.replace=NONE",
-	    "spring.jpa.hibernate.ddl-auto=none",    // laisser le SQL initialiser le schema
-	    "spring.sql.init.mode=always",            // exécute test-schema.sql (classpath:sql/test-schema.sql)
-	    "spring.sql.init.schema-locations=classpath:sql/test-schema.sql"
-	})
+@Sql(scripts = "/sql/test-schema.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
+@SpringBootTest(properties = {
+    "spring.test.database.replace=NONE",
+    "spring.jpa.hibernate.ddl-auto=none",
+    "spring.sql.init.mode=always",
+    "spring.sql.init.schema-locations=classpath:sql/test-schema.sql"
+}, webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Transactional
 class QuestionnaireRepositoryDataJpaTest extends AbstractPostgresIT {
 
     @Autowired
