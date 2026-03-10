@@ -1,9 +1,10 @@
 spring:
   datasource:
-        hikari:
-          connection-timeout: 60000
-          validation-timeout: 5000
-          maximum-pool-size: 10
+    hikari:
+      connection-timeout: 120000   # 120s
+      validation-timeout: 5000
+      maximum-pool-size: 10
+      max-lifetime: 300000
   jpa:
     hibernate:
       ddl-auto: none
@@ -11,7 +12,3 @@ spring:
     init:
       mode: always
       schema-locations: classpath:sql/test-schema.sql
-  
-app:
-  jwtSecret: test-secret
-  uploadDir: target/test-uploads

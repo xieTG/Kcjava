@@ -1,12 +1,11 @@
 package com.xietg.kc.integration;
 
 import org.testcontainers.containers.PostgreSQLContainer;
+import com.github.dockerjava.api.command.CreateContainerCmd;
 
 /**
  * Singleton Postgres container started once per JVM.
- *
- * All tests should reuse SharedPostgresContainer.POSTGRES so we don't start/stop
- * a container per test class (which provoquait le churn de ports et les erreurs Hikari).
+ * Made reusable and given a fixed name so Testcontainers will reuse it instead of creating many.
  */
 public final class SharedPostgresContainer {
 
@@ -14,7 +13,11 @@ public final class SharedPostgresContainer {
         new PostgreSQLContainer<>("postgres:16-alpine")
             .withDatabaseName("kc_test")
             .withUsername("kc")
-            .withPassword("kc");
+            .withPassword("kc")
+            // ask Testcontainers to reuse the container between runs (requires ~/.testcontainers.properties)
+            .withReuse(true)
+            // give it a deterministic container name
+            .withCreateContainerCmdModifier((CreateContainerCmd cmd) -> cmd.withName("kc_test_shared_container"));
 
     static {
         // Start once for the whole JVM so tests reuse the same container:
@@ -31,6 +34,5 @@ public final class SharedPostgresContainer {
         }));
     }
 
-    // Prevent instantiation
     private SharedPostgresContainer() {}
 }

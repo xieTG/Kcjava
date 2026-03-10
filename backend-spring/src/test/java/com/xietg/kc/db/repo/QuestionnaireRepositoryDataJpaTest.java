@@ -18,12 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ActiveProfiles("test")
-//@Sql(scripts = "/sql/test-schema.sql", executionPhase = ExecutionPhase.BEFORE_TEST_CLASS)
 @SpringBootTest(properties = {
     "spring.test.database.replace=NONE",
-    "spring.jpa.hibernate.ddl-auto=none",
-    "spring.sql.init.mode=always",
-    "spring.sql.init.schema-locations=classpath:sql/test-schema.sql"
+    "spring.jpa.hibernate.ddl-auto=none"
 }, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Transactional
 class QuestionnaireRepositoryDataJpaTest extends AbstractPostgresIT {
