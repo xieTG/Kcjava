@@ -1,9 +1,9 @@
 spring:
-	datasource:
-	    hikari:
-	      connection-timeout: 60000
-	      validation-timeout: 5000
-	      maximum-pool-size: 10
+  datasource:
+        hikari:
+          connection-timeout: 60000
+          validation-timeout: 5000
+          maximum-pool-size: 10
   jpa:
     hibernate:
       ddl-auto: none
