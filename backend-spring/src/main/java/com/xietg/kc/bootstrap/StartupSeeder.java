@@ -31,12 +31,18 @@ public class StartupSeeder implements ApplicationRunner {
 	@Override
 	public void run(ApplicationArguments args) throws Exception 
 	{
-		// create upload directory
+			
 		Path uploaddirpath = props.getUploadDir();
+		if (Files.exists(uploaddirpath)) {
 		StartupSeeder.deleteRecursively(uploaddirpath);
+		}
 		Log.info("Create: "+uploaddirpath);
 		Files.createDirectories(uploaddirpath);
 
+		
+		
+		
+		
 	}
 
 
