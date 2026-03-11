@@ -23,7 +23,8 @@ import java.util.List;
  */
 public final class SharedPostgresContainer {
 
-    public static final PostgreSQLContainer<?> POSTGRES =
+    @SuppressWarnings("resource")
+	public static final PostgreSQLContainer<?> POSTGRES =
         new PostgreSQLContainer<>("postgres:16-alpine")
             .withDatabaseName("kc_test")
             .withUsername("kc")

@@ -1,6 +1,7 @@
 package com.xietg.kc.controller;
 
 import com.xietg.kc.db.entity.UserEntity;
+import com.xietg.kc.db.entity.UserRole;
 import com.xietg.kc.db.repo.UserRepository;
 import com.xietg.kc.error.BusinessException;
 import com.xietg.kc.security.JwtService;
@@ -12,48 +13,77 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Locale;
+import java.util.Optional;
 
 @RestController
-public class AuthController {
+public class AuthController
+{
 
-    private final UserRepository userRepository;
-    private final PasswordService passwordService;
-    private final JwtService jwtService;
+	private final UserRepository userRepository;
+	private final PasswordService passwordService;
+	private final JwtService jwtService;
 
-    public AuthController(UserRepository userRepository, PasswordService passwordService, JwtService jwtService) {
-        this.userRepository = userRepository;
-        this.passwordService = passwordService;
-        this.jwtService = jwtService;
-    }
+	public AuthController(UserRepository userRepository, PasswordService passwordService, JwtService jwtService)
+	{
+		this.userRepository = userRepository;
+		this.passwordService = passwordService;
+		this.jwtService = jwtService;
+	}
 
-    @PostMapping("/auth/login")
-    public LoginResponse login(@Valid @RequestBody LoginRequest req) {
-    	
-    	
-        String email = req.email().trim().toLowerCase(Locale.ROOT);
-        String password = req.password();
+	@PostMapping("/auth/login")
+	public LoginResponse login(@Valid @RequestBody LoginRequest req)
+	{
 
-        UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new BusinessException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
+		String email = req.email().trim().toLowerCase(Locale.ROOT);
+		String password = req.password();
 
-        if (!passwordService.verifyPassword(password, user.getPasswordHash())) {
-            throw new BusinessException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
-        }
+		UserEntity user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new BusinessException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
 
-        String token = jwtService.createAccessToken(user.getEmail(), user.getRole().name(), 3600);
+		if (!passwordService.verifyPassword(password, user.getPasswordHash()))
+		{
+			throw new BusinessException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+		}
 
-        return new LoginResponse(token, user.getRole().name());
-    	
-    	
-    }
+		String token = jwtService.createAccessToken(user.getEmail(), user.getRole().name(), 3600);
 
-    public record LoginRequest(
-            @NotBlank @Email String email,
-            @NotBlank String password
-    ) {}
+		return new LoginResponse(token, user.getRole().name());
 
-    public record LoginResponse(
-            String access_token,
-            String role
-    ) {}
+	}
+
+	@PostMapping("/auth/register")
+	public LoginResponse register(@Valid @RequestBody LoginRequest req)
+	{
+
+		String email = req.email().trim().toLowerCase(Locale.ROOT);
+		String password = req.password();
+		UserEntity user = new UserEntity();
+
+		
+		Optional<UserEntity> useree =  userRepository.findByEmail(email);
+		
+		Boolean bool = useree.isEmpty();
+		
+		if (!bool)
+		{
+			throw new BusinessException(HttpStatus.GATEWAY_TIMEOUT, "User already exist");
+		}
+		else
+		{
+			user.setEmail(email);
+			user.setPasswordHash(passwordService.hashPassword(password));
+			user.setRole(UserRole.admin);
+			
+			userRepository.save(user);
+		}
+		return new LoginResponse(null, user.getRole().name());
+}
+
+	public record LoginRequest(@NotBlank @Email String email, @NotBlank String password)
+	{
+	}
+
+	public record LoginResponse(String access_token, String role)
+	{
+	}
 }
