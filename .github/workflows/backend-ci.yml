@@ -40,7 +40,7 @@ jobs:
         with:
           name: surefire-reports
           path: backend-spring/target/surefire-reports/**
-          if-no-files-found: ignore
+          if-no-files-found: error
 
       - name: Upload Failsafe reports
         if: always()
@@ -48,7 +48,7 @@ jobs:
         with:
           name: failsafe-reports
           path: backend-spring/target/failsafe-reports/**
-          if-no-files-found: ignore
+          if-no-files-found: error
 
       - name: Upload JaCoCo report
         if: always()
@@ -58,4 +58,4 @@ jobs:
           path: |
             backend-spring/target/site/jacoco/**
             backend-spring/target/jacoco.exec
-          if-no-files-found: ignore
+          if-no-files-found: error
