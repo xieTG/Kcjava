@@ -59,25 +59,21 @@ public class AuthController
 		String password = req.password();
 		UserEntity user = new UserEntity();
 
-		
-		Optional<UserEntity> useree =  userRepository.findByEmail(email);
-		
-		Boolean bool = useree.isEmpty();
-		
-		if (!bool)
+		Optional<UserEntity> existingUser = userRepository.findByEmail(email);
+
+		if (existingUser.isPresent())
 		{
-			throw new BusinessException(HttpStatus.GATEWAY_TIMEOUT, "User already exist");
+			throw new BusinessException(HttpStatus.CONFLICT, "User already exist");
 		}
-		else
-		{
-			user.setEmail(email);
-			user.setPasswordHash(passwordService.hashPassword(password));
-			user.setRole(UserRole.admin);
-			
-			userRepository.save(user);
-		}
+
+		user.setEmail(email);
+		user.setPasswordHash(passwordService.hashPassword(password));
+		user.setRole(UserRole.admin);
+
+		userRepository.save(user);
+
 		return new LoginResponse(null, user.getRole().name());
-}
+	}
 
 	public record LoginRequest(@NotBlank @Email String email, @NotBlank String password)
 	{

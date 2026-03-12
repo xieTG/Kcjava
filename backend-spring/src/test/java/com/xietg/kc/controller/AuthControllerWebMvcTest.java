@@ -17,6 +17,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 import java.util.Optional;
 
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -66,5 +69,30 @@ class AuthControllerWebMvcTest {
            .andExpect(status().isOk())
            .andExpect(jsonPath("$.access_token").value("jwt-token"))
            .andExpect(jsonPath("$.role").value("admin"));
+    }
+    @Test
+    void register_should_return_conflict_when_user_already_exists() throws Exception {
+        UserEntity existingUser = new UserEntity();
+        existingUser.setEmail("admin@example.com");
+        existingUser.setPasswordHash("hashed");
+        existingUser.setRole(UserRole.admin);
+
+        when(userRepository.findByEmail(eq("admin@example.com")))
+                .thenReturn(Optional.of(existingUser));
+
+        String body = """
+            {
+              "email": "admin@example.com",
+              "password": "secret"
+            }
+            """;
+
+        mvc.perform(post("/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+           .andExpect(status().isConflict());
+
+        verify(userRepository, never()).save(any(UserEntity.class));
+        verify(passwordService, never()).hashPassword(any());
     }
 }
