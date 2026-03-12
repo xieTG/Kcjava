@@ -3,6 +3,7 @@ package com.xietg.kc.controller;
 import com.xietg.kc.db.entity.UserEntity;
 import com.xietg.kc.db.entity.UserRole;
 import com.xietg.kc.db.repo.UserRepository;
+import com.xietg.kc.security.AuthService;
 import com.xietg.kc.security.JwtService;
 import com.xietg.kc.security.PasswordService;
 import org.junit.jupiter.api.Test;
@@ -38,12 +39,11 @@ class AuthControllerWebMvcTest {
     @MockitoBean
     JwtService jwtService;
 
-    
+    @MockitoBean
+    AuthService authService;
+
     @Test
     void login_should_return_token_and_role() throws Exception {
-    	
-    	
-    	
         UserEntity user = new UserEntity();
         user.setEmail("admin@example.com");
         user.setPasswordHash("hashed");
