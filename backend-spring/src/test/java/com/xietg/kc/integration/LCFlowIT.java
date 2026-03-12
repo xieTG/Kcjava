@@ -29,7 +29,7 @@ class LCFlowIT extends AbstractPostgresIT {
 
         String authBody = """
             {
-              "email": "it-lc@test.com",
+              "email": "it-lc-lc-flow@test.com",
               "password": "Password123!"
             }
         """;

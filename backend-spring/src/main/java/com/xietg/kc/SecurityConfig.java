@@ -1,6 +1,9 @@
 package com.xietg.kc;
 
 import com.xietg.kc.security.JwtAuthenticationFilter;
+
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,6 +21,12 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
 
         return http
+        		.exceptionHandling(ex -> ex
+        			    .authenticationEntryPoint((request, response, authException) ->
+        			        response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
+        			    .accessDeniedHandler((request, response, accessDeniedException) ->
+        			        response.sendError(HttpServletResponse.SC_FORBIDDEN))
+        			)
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .httpBasic(AbstractHttpConfigurer::disable)

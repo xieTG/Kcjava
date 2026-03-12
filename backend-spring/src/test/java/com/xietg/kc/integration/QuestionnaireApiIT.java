@@ -35,7 +35,7 @@ class QuestionnaireApiIT extends AbstractPostgresIT {
     	ObjectMapper objectMapper = new ObjectMapper();
     	 String authBody = """
     	            {
-    	              "email": "it-lc@test.com",
+    	              "email": "it-lc-questionnaire-flow@test.com",
     	              "password": "Password123!"
     	            }
     	        """;
