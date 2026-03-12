@@ -6,6 +6,7 @@ import com.xietg.kc.db.repo.LCRepository;
 import com.xietg.kc.db.repo.QuestionnaireRepository;
 import com.xietg.kc.error.BusinessException;
 import com.xietg.kc.security.AuthService;
+import com.xietg.kc.security.CurrentUserService;
 import com.xietg.kc.service.SubmissionService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -26,21 +27,23 @@ public class QuestionnaireController
 
 	private final LCRepository lcRepository;
 
-	private final AuthService authService;
+	private final CurrentUserService currentUserService;
 	private final SubmissionService submissionService;
 
 	public QuestionnaireController(QuestionnaireRepository questionnaireRepository, LCRepository lcRepository,
-			AuthService authService, SubmissionService submissionService)
+			CurrentUserService currentUserService, SubmissionService submissionService)
 	{
 		this.questionnaireRepository = questionnaireRepository;
 		this.lcRepository = lcRepository;
-		this.authService = authService;
+		this.currentUserService = currentUserService;
 		this.submissionService = submissionService;
 	}
 
 	@GetMapping("/questionnaires")
 	public List<QuestionnaireDto> listQuestionnaires()
 	{
+		currentUserService.requireCurrentUser();
+		
 		return questionnaireRepository.findByStatus("published").stream()
 				.map(q -> new QuestionnaireDto(q.getId().toString(), q.getName(), q.getVersion())).toList();
 	}
@@ -49,7 +52,7 @@ public class QuestionnaireController
 	public SubmissionResponse uploadSubmission(@PathVariable UUID lcId, @RequestPart("file") MultipartFile file,
 			@RequestHeader(value = "Authorization", required = false) String authorization)
 	{
-		UserEntity user = authService.requireUser(authorization);
+		UserEntity user = currentUserService.requireCurrentUser();
 
 		// 1- Check if the LC as already a questionnnaire
 		LCEntity lc = lcRepository.findById(lcId).orElseThrow(() -> BusinessException.notFound("LC not found"));

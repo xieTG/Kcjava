@@ -4,6 +4,7 @@ import com.xietg.kc.db.entity.SubmissionEntity;
 import com.xietg.kc.db.entity.UserEntity;
 import com.xietg.kc.db.repo.SubmissionRepository;
 import com.xietg.kc.security.AuthService;
+import com.xietg.kc.security.CurrentUserService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -18,12 +19,13 @@ import java.util.Map;
 @SecurityRequirement(name = "bearerAuth")
 @RestController
 public class SubmissionController {
-//TODO: rename into SubmissionController
-    private final AuthService authService;
+
+
+	private final CurrentUserService currentUserService;
     private final SubmissionRepository submissionRepository;
 
-    public SubmissionController(AuthService authService, SubmissionRepository submissionRepository) {
-        this.authService = authService;
+    public SubmissionController(CurrentUserService currentUserService, SubmissionRepository submissionRepository) {
+        this.currentUserService = currentUserService;
         this.submissionRepository = submissionRepository;
     }
 
@@ -31,7 +33,7 @@ public class SubmissionController {
     public List<MySubmissionDto> mySubmissions(
             @RequestHeader(value = "Authorization", required = false) String authorization
     ) {
-        UserEntity user = authService.requireUser(authorization);
+        UserEntity user = currentUserService.requireCurrentUser();
 
         List<SubmissionEntity> subs = submissionRepository.findByUserIdOrderBySubmittedAtDesc(user.getId());
 

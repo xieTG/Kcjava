@@ -25,6 +25,7 @@ import com.xietg.kc.db.repo.QuestionnaireRepository;
 import com.xietg.kc.error.BusinessException;
 import com.xietg.kc.excel.ExcelBuilder;
 import com.xietg.kc.security.AuthService;
+import com.xietg.kc.security.CurrentUserService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -36,20 +37,20 @@ import jakarta.validation.constraints.NotBlank;
 public class LCController {
 
 	private final LCRepository lcRepository;
-	private final AuthService authService;
+	private final CurrentUserService currentUserService;
 	private final ExcelBuilder templateBuilder;
 	private final QuestionRepository questionRepository;
 	private final QuestionnaireRepository questionnaireRepository;
 
 	public LCController(
 			LCRepository lcRepository,
-			AuthService authService,
+			CurrentUserService currentUserService,
 			QuestionRepository questionRepository,
 			ExcelBuilder templateBuilder,
 			QuestionnaireRepository questionnaireRepository)
 	{
 		this.lcRepository = lcRepository;
-		this.authService = authService;
+		this.currentUserService = currentUserService;
 		this.templateBuilder=templateBuilder;
 		this.questionRepository=questionRepository;
 		this.questionnaireRepository=questionnaireRepository;
@@ -58,7 +59,7 @@ public class LCController {
 	@GetMapping("/lcs")
 	public List<LCDto> listLC(@RequestHeader(value = "Authorization", required = false) String authorization) 
 	{
-		authService.requireUser(authorization);
+		currentUserService.requireCurrentUser();
 		return lcRepository.findAll()
 				.stream()
 				.map(lc -> new LCDto(lc.getId(), lc.getName(),lc.getYear(), lc.getDescription(),lc.getQuestionnaireId()))
@@ -69,7 +70,7 @@ public class LCController {
 	@PostMapping("/lcs")
 	public LCDto createLC(@Valid @RequestBody LCRequest req,@RequestHeader(value = "Authorization", required = false) String authorization) 
 	{
-		authService.requireUser(authorization);
+		currentUserService.requireCurrentUser();
 
 		if(lcRepository.findByName(req.name).isEmpty() != true){
 			throw new BusinessException(HttpStatus.OK, "LC Already Exists");
@@ -90,7 +91,7 @@ public class LCController {
 	public ResponseEntity<byte[]> downloadXLSX(@PathVariable UUID lcId,@RequestHeader(value = "Authorization", required = false) String authorization) {
 		// We should be able to download the questionnaire for an LC. If no questionnaire -> return error
 
-		authService.requireUser(authorization);
+		currentUserService.requireCurrentUser();
 
 		if(lcId==null ||lcId.toString().isEmpty())
 		{
@@ -128,7 +129,7 @@ public class LCController {
 	@PutMapping("/lcs/{lcId}/questionnaire")
 	public LCDto attachQuestionnaireToLC(@PathVariable UUID lcId,@RequestBody AttachQuestionnaireRequest req,@RequestHeader("Authorization") String authorization) 
 	{
-		authService.requireUser(authorization);
+		currentUserService.requireCurrentUser();
 
 
 		//1- Check if the LC existe
