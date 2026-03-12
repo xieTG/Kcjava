@@ -35,7 +35,7 @@ class QuestionnaireApiIT extends AbstractPostgresIT {
 
         // When + Then
         webTestClient.get()
-                .uri("/api/questionnaires")
+                .uri("/questionnaires")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class)

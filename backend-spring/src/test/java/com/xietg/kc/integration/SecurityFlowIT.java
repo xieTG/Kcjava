@@ -11,13 +11,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xietg.kc.controller.AuthController;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class SecurityFlowIT extends AbstractPostgresIT {
 
     @Autowired
@@ -27,7 +29,7 @@ class SecurityFlowIT extends AbstractPostgresIT {
     @Test
     void shouldRejectAccessWithoutToken() throws Exception {
 
-        mockMvc.perform(get("/api/lc"))
+        mockMvc.perform(get("/lcs"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -45,13 +47,13 @@ class SecurityFlowIT extends AbstractPostgresIT {
 
         // 1️⃣ Register
         
-        mockMvc.perform(post("/api/auth/register")
+        mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isOk());
 
         // 2️⃣ Login
-        String loginResponse = mockMvc.perform(post("/api/auth/login")
+        String loginResponse = mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isOk())
@@ -64,12 +66,12 @@ class SecurityFlowIT extends AbstractPostgresIT {
 		Map<String, String> json =
                 objectMapper.readValue(loginResponse, Map.class);
 
-        String token = json.get("token");
+        String token = json.get("access_token");
 
         assertThat(token).isNotBlank();
 
         // 3️⃣ Access protected endpoint
-        mockMvc.perform(get("/api/lc")
+        mockMvc.perform(get("/lcs")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 

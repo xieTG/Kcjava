@@ -52,3 +52,13 @@ CREATE TABLE lc (
   description VARCHAR(255) NOT NULL,
   year INTEGER NOT NULL
 );
+
+INSERT INTO users (id, email, password_hash, role, created_at)
+VALUES (
+  '00000000-0000-0000-0000-000000000001',
+  'admin@example.com',
+  '$2a$10$5eqJKF67z1ply2w/rqUtoup2OEJxZMlOVRf3qH9PvELsOP0ij0GXS',
+  'admin',
+  NOW()
+)
+ON CONFLICT (email) DO NOTHING;

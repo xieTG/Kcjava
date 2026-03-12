@@ -9,6 +9,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWebTestClient
 class LCFlowIT extends AbstractPostgresIT {
 
     @Autowired
@@ -27,7 +28,7 @@ class LCFlowIT extends AbstractPostgresIT {
 
         // Create LC
         webTestClient.post()
-                .uri("/api/lc")
+                .uri("/lcs")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)
                 .exchange()
@@ -35,7 +36,7 @@ class LCFlowIT extends AbstractPostgresIT {
 
         // Fetch all LCs
         webTestClient.get()
-                .uri("/api/lc")
+                .uri("/lcs")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class)
