@@ -6,7 +6,8 @@ import com.xietg.kc.db.entity.QuestionnaireEntity;
 import com.xietg.kc.db.entity.UserEntity;
 import com.xietg.kc.db.repo.LCRepository;
 import com.xietg.kc.db.repo.QuestionnaireRepository;
-import com.xietg.kc.security.AuthService;
+import com.xietg.kc.security.CurrentUserService;
+import org.springframework.http.HttpHeaders;
 import com.xietg.kc.service.SubmissionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ class QuestionnaireControllerWebMvcTest {
     LCRepository lcRepository;
 
     @MockitoBean
-    AuthService authService;
+    CurrentUserService currentUserService;
 
     @MockitoBean
     SubmissionService submissionService;
@@ -69,10 +70,12 @@ class QuestionnaireControllerWebMvcTest {
         q2.setName("IAM Assessment 2026");
         q2.setVersion(3);
 
+        when(currentUserService.requireCurrentUser()).thenReturn(authenticatedUser());
         when(questionnaireRepository.findByStatus("published"))
                 .thenReturn(List.of(q1, q2));
 
-        mvc.perform(get("/questionnaires"))
+        mvc.perform(get("/questionnaires")
+           .header(HttpHeaders.AUTHORIZATION, "Bearer token"))
            .andExpect(status().isOk())
            .andExpect(jsonPath("$[0].id").value(q1Id.toString()))
            .andExpect(jsonPath("$[0].name").value("Leadership Compass 2026"))
@@ -102,7 +105,7 @@ class QuestionnaireControllerWebMvcTest {
                 "fake-xlsx-content".getBytes()
         );
 
-        when(authService.requireUser(anyString())).thenReturn(user);
+        when(currentUserService.requireCurrentUser()).thenReturn(user);
         when(lcRepository.findById(lcId)).thenReturn(Optional.of(lc));
         when(submissionService.createSubmission(any(LCEntity.class), any(UserEntity.class), any()))
                 .thenReturn(new SubmissionService.SubmissionResult(submissionId, "parsed_ok"));

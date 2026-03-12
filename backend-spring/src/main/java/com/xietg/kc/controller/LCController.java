@@ -56,7 +56,7 @@ public class LCController {
 	}
 
 	@GetMapping("/lcs")
-	public List<LCDto> listLC(@RequestHeader(value = "Authorization", required = false) String authorization) 
+	public List<LCDto> listLC() 
 	{
 		currentUserService.requireCurrentUser();
 		return lcRepository.findAll()
@@ -67,7 +67,7 @@ public class LCController {
 	}
 
 	@PostMapping("/lcs")
-	public LCDto createLC(@Valid @RequestBody LCRequest req,@RequestHeader(value = "Authorization", required = false) String authorization) 
+	public LCDto createLC(@Valid @RequestBody LCRequest req) 
 	{
 		currentUserService.requireCurrentUser();
 
@@ -87,7 +87,7 @@ public class LCController {
 	}
 
 	@GetMapping("/lcs/{lcId}/xlsx")
-	public ResponseEntity<byte[]> downloadXLSX(@PathVariable UUID lcId,@RequestHeader(value = "Authorization", required = false) String authorization) {
+	public ResponseEntity<byte[]> downloadXLSX(@PathVariable UUID lcId) {
 		// We should be able to download the questionnaire for an LC. If no questionnaire -> return error
 
 		currentUserService.requireCurrentUser();
@@ -126,7 +126,7 @@ public class LCController {
 	}
 
 	@PutMapping("/lcs/{lcId}/questionnaire")
-	public LCDto attachQuestionnaireToLC(@PathVariable UUID lcId,@RequestBody AttachQuestionnaireRequest req,String authorization) 
+	public LCDto attachQuestionnaireToLC(@PathVariable UUID lcId,@RequestBody AttachQuestionnaireRequest req) 
 	{
 		currentUserService.requireCurrentUser();
 

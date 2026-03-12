@@ -48,8 +48,7 @@ public class QuestionnaireController
 	}
 
 	@PostMapping(value = "/lcs/{lcId}/submissions", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public SubmissionResponse uploadSubmission(@PathVariable UUID lcId, @RequestPart("file") MultipartFile file,
-			@RequestHeader(value = "Authorization", required = false) String authorization)
+	public SubmissionResponse uploadSubmission(@PathVariable UUID lcId, @RequestPart("file") MultipartFile file)
 	{
 		UserEntity user = currentUserService.requireCurrentUser();
 
