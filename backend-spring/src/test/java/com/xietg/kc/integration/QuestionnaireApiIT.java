@@ -1,46 +1,50 @@
 package com.xietg.kc.integration;
 
-import com.xietg.kc.db.entity.QuestionnaireEntity;
-import com.xietg.kc.db.repo.QuestionnaireRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Map;
+import java.util.UUID;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.UUID;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xietg.kc.db.entity.QuestionnaireEntity;
+import com.xietg.kc.db.repo.QuestionnaireRepository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-
+@SpringBootTest
+@AutoConfigureMockMvc
 class QuestionnaireApiIT extends AbstractPostgresIT {
 
-	@Autowired
-	private WebTestClient webTestClient;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
     private QuestionnaireRepository repository;
 
+    
     @Test
-    void shouldReturnAllQuestionnaires() {
-        // Given
+    void shouldReturnAllQuestionnaires() throws Exception {
         QuestionnaireEntity q = new QuestionnaireEntity();
         q.setId(UUID.randomUUID());
         q.setName("IT Questionnaire");
         q.setVersion(1);
-        q.setStatus("DRAFT");
-
+        q.setStatus("published");
         repository.save(q);
 
-        // When + Then
-        webTestClient.get()
-                .uri("/questionnaires")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(String.class)
-                .value(body ->
-                        assertThat(body).contains("IT Questionnaire")
-                );
+        String body = mockMvc.perform(get("/questionnaires"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThat(body).contains("IT Questionnaire");
     }
 }

@@ -1,22 +1,56 @@
 package com.xietg.kc.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.MockMvc;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWebTestClient
+@SpringBootTest
+@AutoConfigureMockMvc
 class LCFlowIT extends AbstractPostgresIT {
 
     @Autowired
-    private WebTestClient webTestClient;
+    private MockMvc mockMvc;
 
     @Test
-    void shouldCreateAndFetchLC() {
+    void shouldCreateAndFetchLC() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        String authBody = """
+            {
+              "email": "it-lc@test.com",
+              "password": "Password123!"
+            }
+        """;
+
+        mockMvc.perform(post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(authBody))
+                .andExpect(status().isOk());
+
+        String loginResponse = mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(authBody))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        @SuppressWarnings("unchecked")
+        Map<String, String> json = objectMapper.readValue(loginResponse, Map.class);
+
+        String token = json.get("access_token");
 
         String requestBody = """
             {
@@ -26,22 +60,19 @@ class LCFlowIT extends AbstractPostgresIT {
             }
         """;
 
-        // Create LC
-        webTestClient.post()
-                .uri("/lcs")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(requestBody)
-                .exchange()
-                .expectStatus().isOk();
+        mockMvc.perform(post("/lcs")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk());
 
-        // Fetch all LCs
-        webTestClient.get()
-                .uri("/lcs")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(String.class)
-                .value(body ->
-                        assertThat(body).contains("LC 2026")
-                );
+        String body = mockMvc.perform(get("/lcs")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThat(body).contains("LC 2026");
     }
 }
