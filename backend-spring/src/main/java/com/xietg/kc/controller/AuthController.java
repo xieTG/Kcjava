@@ -63,7 +63,7 @@ public class AuthController
 
 		if (existingUser.isPresent())
 		{
-			throw new BusinessException(HttpStatus.CONFLICT, "User already exist");
+			throw new BusinessException(HttpStatus.CONFLICT, "User already exists");
 		}
 
 		user.setEmail(email);

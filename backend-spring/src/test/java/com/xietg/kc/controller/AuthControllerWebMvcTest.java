@@ -94,7 +94,9 @@ class AuthControllerWebMvcTest {
         mvc.perform(post("/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body))
-           .andExpect(status().isConflict());
+           .andExpect(status().isConflict())
+           .andExpect(jsonPath("$.code").value("666"))
+           .andExpect(jsonPath("$.message").value("User already exists"));
 
         verify(userRepository, never()).save(any(UserEntity.class));
         verify(passwordService, never()).hashPassword(any());
