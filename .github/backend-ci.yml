@@ -1,0 +1,61 @@
+name: backend-ci
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - "backend-spring/**"
+      - ".github/workflows/backend-ci.yml"
+  push:
+    branches: [ main ]
+    paths:
+      - "backend-spring/**"
+      - ".github/workflows/backend-ci.yml"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend-spring
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Run full verify
+        run: mvn -B clean verify
+
+      - name: Upload Surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: backend-spring/target/surefire-reports/**
+          if-no-files-found: ignore
+
+      - name: Upload Failsafe reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failsafe-reports
+          path: backend-spring/target/failsafe-reports/**
+          if-no-files-found: ignore
+
+      - name: Upload JaCoCo report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: |
+            backend-spring/target/site/jacoco/**
+            backend-spring/target/jacoco.exec
+          if-no-files-found: ignore
