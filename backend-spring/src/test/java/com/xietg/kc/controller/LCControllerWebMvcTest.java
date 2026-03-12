@@ -9,7 +9,7 @@ import com.xietg.kc.db.repo.LCRepository;
 import com.xietg.kc.db.repo.QuestionRepository;
 import com.xietg.kc.db.repo.QuestionnaireRepository;
 import com.xietg.kc.excel.ExcelBuilder;
-import com.xietg.kc.security.AuthService;
+import com.xietg.kc.security.CurrentUserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -45,8 +45,8 @@ class LCControllerWebMvcTest {
     @MockitoBean
     LCRepository lcRepository;
 
-    @MockitoBean
-    AuthService authService;
+    @MockitoBean 
+    CurrentUserService currentUserService;
 
     @MockitoBean
     ExcelBuilder templateBuilder;
@@ -66,7 +66,7 @@ class LCControllerWebMvcTest {
 
     @Test
     void listLC_should_return_all_lcs() throws Exception {
-        when(authService.requireUser(anyString())).thenReturn(authenticatedUser());
+    	when(currentUserService.requireCurrentUser()).thenReturn(authenticatedUser());
 
         UUID lcId = UUID.randomUUID();
         UUID questionnaireId = UUID.randomUUID();
@@ -92,7 +92,7 @@ class LCControllerWebMvcTest {
 
     @Test
     void createLC_should_create_and_return_lc() throws Exception {
-        when(authService.requireUser(anyString())).thenReturn(authenticatedUser());
+    	when(currentUserService.requireCurrentUser()).thenReturn(authenticatedUser());
         when(lcRepository.findByName("Microsoft")).thenReturn(List.of());
         when(lcRepository.save(any(LCEntity.class))).thenAnswer(invocation -> {
             LCEntity lc = invocation.getArgument(0);
@@ -125,7 +125,7 @@ class LCControllerWebMvcTest {
 
     @Test
     void createLC_should_return_bad_request_when_name_is_blank() throws Exception {
-        when(authService.requireUser(anyString())).thenReturn(authenticatedUser());
+    	when(currentUserService.requireCurrentUser()).thenReturn(authenticatedUser());
 
         String body = """
             {
@@ -145,7 +145,7 @@ class LCControllerWebMvcTest {
 
     @Test
     void attachQuestionnaireToLC_should_update_and_return_lc() throws Exception {
-        when(authService.requireUser(anyString())).thenReturn(authenticatedUser());
+    	when(currentUserService.requireCurrentUser()).thenReturn(authenticatedUser());
 
         UUID lcId = UUID.randomUUID();
         UUID questionnaireId = UUID.randomUUID();
@@ -177,7 +177,7 @@ class LCControllerWebMvcTest {
 
     @Test
     void downloadXlsx_should_return_file() throws Exception {
-        when(authService.requireUser(anyString())).thenReturn(authenticatedUser());
+    	when(currentUserService.requireCurrentUser()).thenReturn(authenticatedUser());
 
         UUID lcId = UUID.randomUUID();
         UUID questionnaireId = UUID.randomUUID();

@@ -20,10 +20,10 @@ import java.util.Locale;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final AuthService authService;
+    private final CurrentUserService currentUserService;
 
-    public JwtAuthenticationFilter(AuthService authService) {
-        this.authService = authService;
+    public JwtAuthenticationFilter(CurrentUserService currentUserService) {
+        this.currentUserService = currentUserService;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            UserEntity user = authService.requireUser(authorization);
+            UserEntity user = currentUserService.requireCurrentUser();
 
             var authorities = List.of(
                     new SimpleGrantedAuthority("ROLE_" + user.getRole().name().toUpperCase(Locale.ROOT))

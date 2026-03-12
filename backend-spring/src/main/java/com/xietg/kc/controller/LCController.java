@@ -24,7 +24,6 @@ import com.xietg.kc.db.repo.QuestionRepository;
 import com.xietg.kc.db.repo.QuestionnaireRepository;
 import com.xietg.kc.error.BusinessException;
 import com.xietg.kc.excel.ExcelBuilder;
-import com.xietg.kc.security.AuthService;
 import com.xietg.kc.security.CurrentUserService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -127,7 +126,7 @@ public class LCController {
 	}
 
 	@PutMapping("/lcs/{lcId}/questionnaire")
-	public LCDto attachQuestionnaireToLC(@PathVariable UUID lcId,@RequestBody AttachQuestionnaireRequest req,@RequestHeader("Authorization") String authorization) 
+	public LCDto attachQuestionnaireToLC(@PathVariable UUID lcId,@RequestBody AttachQuestionnaireRequest req,String authorization) 
 	{
 		currentUserService.requireCurrentUser();
 

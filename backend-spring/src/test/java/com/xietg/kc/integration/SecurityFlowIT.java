@@ -10,16 +10,13 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xietg.kc.controller.AuthController;
 
 @SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
+
 class SecurityFlowIT extends AbstractPostgresIT {
 
     @Autowired

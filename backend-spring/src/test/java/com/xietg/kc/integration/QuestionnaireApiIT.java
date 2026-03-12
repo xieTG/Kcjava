@@ -32,6 +32,32 @@ class QuestionnaireApiIT extends AbstractPostgresIT {
     
     @Test
     void shouldReturnAllQuestionnaires() throws Exception {
+    	ObjectMapper objectMapper = new ObjectMapper();
+    	 String authBody = """
+    	            {
+    	              "email": "it-lc@test.com",
+    	              "password": "Password123!"
+    	            }
+    	        """;
+
+    	        mockMvc.perform(post("/auth/register")
+    	                        .contentType(MediaType.APPLICATION_JSON)
+    	                        .content(authBody))
+    	                .andExpect(status().isOk());
+
+    	        String loginResponse = mockMvc.perform(post("/auth/login")
+    	                        .contentType(MediaType.APPLICATION_JSON)
+    	                        .content(authBody))
+    	                .andExpect(status().isOk())
+    	                .andReturn()
+    	                .getResponse()
+    	                .getContentAsString();
+    	
+    	        @SuppressWarnings("unchecked")
+    	        Map<String, String> json = objectMapper.readValue(loginResponse, Map.class);
+
+    	        String token = json.get("access_token");
+    	
         QuestionnaireEntity q = new QuestionnaireEntity();
         q.setId(UUID.randomUUID());
         q.setName("IT Questionnaire");
@@ -39,7 +65,8 @@ class QuestionnaireApiIT extends AbstractPostgresIT {
         q.setStatus("published");
         repository.save(q);
 
-        String body = mockMvc.perform(get("/questionnaires"))
+        String body = mockMvc.perform(get("/questionnaires")
+        		.header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()

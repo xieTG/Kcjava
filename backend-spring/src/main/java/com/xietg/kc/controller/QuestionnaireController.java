@@ -5,7 +5,6 @@ import com.xietg.kc.db.entity.UserEntity;
 import com.xietg.kc.db.repo.LCRepository;
 import com.xietg.kc.db.repo.QuestionnaireRepository;
 import com.xietg.kc.error.BusinessException;
-import com.xietg.kc.security.AuthService;
 import com.xietg.kc.security.CurrentUserService;
 import com.xietg.kc.service.SubmissionService;
 

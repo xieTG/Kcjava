@@ -3,7 +3,6 @@ package com.xietg.kc.controller;
 import com.xietg.kc.db.entity.SubmissionEntity;
 import com.xietg.kc.db.entity.UserEntity;
 import com.xietg.kc.db.repo.SubmissionRepository;
-import com.xietg.kc.security.AuthService;
 import com.xietg.kc.security.CurrentUserService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
