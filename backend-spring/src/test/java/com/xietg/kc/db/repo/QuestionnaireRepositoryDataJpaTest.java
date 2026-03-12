@@ -3,6 +3,7 @@ package com.xietg.kc.db.repo;
 import com.xietg.kc.db.entity.QuestionnaireEntity;
 import com.xietg.kc.integration.AbstractPostgresIT;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,6 +27,7 @@ class QuestionnaireRepositoryDataJpaTest extends AbstractPostgresIT {
     QuestionnaireRepository questionnaireRepository;
 
     @Test
+    @DisplayName("Returns only questionnaires that match the requested status")
     void findByStatus_should_return_only_matching_questionnaires() {
         QuestionnaireEntity q1 = buildQuestionnaire("Questionnaire A", 1, "published", "template-a");
         QuestionnaireEntity q2 = buildQuestionnaire("Questionnaire B", 1, "draft", "template-b");
@@ -43,6 +45,8 @@ class QuestionnaireRepositoryDataJpaTest extends AbstractPostgresIT {
     }
 
     @Test
+    @DisplayName("Returns an empty list when no questionnaire matches the requested status")
+
     void findByStatus_should_return_empty_list_when_none_exists() {
         List<QuestionnaireEntity> result = questionnaireRepository.findByStatus("non-existent-status");
         assertTrue(result.isEmpty());

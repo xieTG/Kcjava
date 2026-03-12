@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Map;
 import java.util.UUID;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +32,8 @@ class QuestionnaireApiIT extends AbstractPostgresIT {
 
     
     @Test
+    @DisplayName("Returns published questionnaires for an authenticated user in integration flow")
+
     void shouldReturnAllQuestionnaires() throws Exception {
     	ObjectMapper objectMapper = new ObjectMapper();
     	 String authBody = """

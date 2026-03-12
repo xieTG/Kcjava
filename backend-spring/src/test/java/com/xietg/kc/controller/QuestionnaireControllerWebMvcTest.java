@@ -10,6 +10,8 @@ import com.xietg.kc.security.CurrentUserService;
 import com.xietg.kc.security.AuthService;
 import org.springframework.http.HttpHeaders;
 import com.xietg.kc.service.SubmissionService;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -60,6 +62,7 @@ class QuestionnaireControllerWebMvcTest {
     }
 
     @Test
+    @DisplayName("Returns published questionnaires for an authenticated user")
     void listQuestionnaires_should_return_published_questionnaires() throws Exception {
         UUID q1Id = UUID.randomUUID();
         UUID q2Id = UUID.randomUUID();
@@ -91,6 +94,7 @@ class QuestionnaireControllerWebMvcTest {
     }
 
     @Test
+    @DisplayName("Uploads a submission and returns its identifier and status")
     void uploadSubmission_should_return_submission_id_and_status() throws Exception {
         UUID lcId = UUID.randomUUID();
         UUID submissionId = UUID.randomUUID();

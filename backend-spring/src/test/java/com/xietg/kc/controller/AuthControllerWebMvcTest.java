@@ -6,6 +6,8 @@ import com.xietg.kc.db.repo.UserRepository;
 import com.xietg.kc.security.AuthService;
 import com.xietg.kc.security.JwtService;
 import com.xietg.kc.security.PasswordService;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import com.xietg.kc.config.AppProperties;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,7 @@ class AuthControllerWebMvcTest {
     AuthService authService;
 
     @Test
+    @DisplayName("Login returns JWT token and role for valid credentials")
     void login_should_return_token_and_role() throws Exception {
         UserEntity user = new UserEntity();
         user.setEmail("admin@example.com");
@@ -71,6 +74,7 @@ class AuthControllerWebMvcTest {
            .andExpect(jsonPath("$.role").value("admin"));
     }
     @Test
+    @DisplayName("Returns 409 Conflict when registering an email that already exists")
     void register_should_return_conflict_when_user_already_exists() throws Exception {
         UserEntity existingUser = new UserEntity();
         existingUser.setEmail("admin@example.com");

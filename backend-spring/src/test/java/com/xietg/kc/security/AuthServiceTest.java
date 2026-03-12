@@ -4,6 +4,7 @@ import com.xietg.kc.db.entity.UserEntity;
 import com.xietg.kc.db.repo.UserRepository;
 import com.xietg.kc.error.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
@@ -26,6 +27,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Returns the user associated with a valid Bearer token")
     void should_return_user_for_valid_bearer_token() {
         UserEntity user = new UserEntity();
         user.setId(UUID.randomUUID());
@@ -44,6 +46,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Rejects authentication when the Authorization header is missing")
     void should_reject_missing_header() {
         BusinessException ex = assertThrows(
                 BusinessException.class,
@@ -56,7 +59,8 @@ class AuthServiceTest {
     }
 
     @Test
-    void should_reject_non_bearer_header() {
+    @DisplayName("Rejects authentication when the Authorization header is not Bearer")
+void should_reject_non_bearer_header() {
         BusinessException ex = assertThrows(
                 BusinessException.class,
                 () -> authService.requireUser("Basic abc123")
@@ -68,7 +72,8 @@ class AuthServiceTest {
     }
 
     @Test
-    void should_reject_blank_subject_in_token() {
+    @DisplayName("Rejects authentication when the JWT subject is blank")
+void should_reject_blank_subject_in_token() {
         when(jwtService.decodeToken("bad-token"))
                 .thenReturn(new JwtService.JwtPayload("   ", "admin"));
 
@@ -84,7 +89,8 @@ class AuthServiceTest {
     }
 
     @Test
-    void should_reject_unknown_user() {
+    @DisplayName("Rejects authentication when the JWT user does not exist in the database")
+void should_reject_unknown_user() {
         when(jwtService.decodeToken("good-token"))
                 .thenReturn(new JwtService.JwtPayload("user@example.com", "user"));
         when(userRepository.findByEmail("user@example.com"))

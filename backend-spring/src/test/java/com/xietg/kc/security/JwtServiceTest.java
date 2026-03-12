@@ -3,6 +3,7 @@ package com.xietg.kc.security;
 import com.xietg.kc.config.AppProperties;
 import com.xietg.kc.error.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,6 +20,7 @@ class JwtServiceTest {
     }
 
     @Test
+    @DisplayName("Creates a valid JWT token and decodes its subject and role")
     void should_create_and_decode_valid_token() {
         String token = jwtService.createAccessToken("admin@example.com", "admin", 3600);
 
@@ -29,6 +31,7 @@ class JwtServiceTest {
     }
 
     @Test
+    @DisplayName("Rejects an expired JWT token")
     void should_reject_expired_token() throws InterruptedException {
         String token = jwtService.createAccessToken("admin@example.com", "admin", 1);
 
@@ -44,6 +47,7 @@ class JwtServiceTest {
     }
 
     @Test
+    @DisplayName("Rejects an invalid JWT token format")
     void should_reject_invalid_token() {
         BusinessException ex = assertThrows(
                 BusinessException.class,

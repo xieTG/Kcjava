@@ -1,6 +1,7 @@
 package com.xietg.kc.security;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,6 +16,7 @@ class PasswordServiceTest {
     }
 
     @Test
+    @DisplayName("Hashes a password and verifies it successfully")
     void should_hash_and_verify_password() {
         String rawPassword = "S3cretPwd!";
         String hash = passwordService.hashPassword(rawPassword);
@@ -25,6 +27,8 @@ class PasswordServiceTest {
     }
 
     @Test
+    @DisplayName("Rejects password verification for a wrong password")
+    
     void should_reject_wrong_password() {
         String hash = passwordService.hashPassword("good-password");
 
@@ -32,6 +36,7 @@ class PasswordServiceTest {
     }
 
     @Test
+    @DisplayName("Generates different hashes for the same password")
     void should_generate_different_hashes_for_same_password() {
         String rawPassword = "same-password";
 

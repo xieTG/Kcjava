@@ -1,5 +1,6 @@
 package com.xietg.kc.integration;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -19,6 +20,7 @@ class AuthLoginIT extends AbstractPostgresIT {
     MockMvc mvc;
 
     @Test
+    @DisplayName("Logs in successfully with the seeded admin user")
     void login_should_work_with_seeded_user() throws Exception {
         mvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)

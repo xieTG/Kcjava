@@ -2,6 +2,8 @@ package com.xietg.kc.db.repo;
 
 import com.xietg.kc.db.entity.QuestionEntity;
 import com.xietg.kc.integration.AbstractPostgresIT;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,6 +28,8 @@ class QuestionRepositoryDataJpaTest extends AbstractPostgresIT {
     QuestionRepository questionRepository;
 
     @Test
+    @DisplayName("Returns only questions that belong to the requested questionnaire")
+
     void findAllByQuestionnaireId_should_return_only_matching_questions() {
         UUID questionnaire1 = UUID.randomUUID();
         UUID questionnaire2 = UUID.randomUUID();
@@ -44,6 +48,7 @@ class QuestionRepositoryDataJpaTest extends AbstractPostgresIT {
     }
 
     @Test
+    @DisplayName("Returns sorted distinct question tabs for a questionnaire")
     void findDistinctQuestionTabsByQuestionnaireId_should_return_sorted_distinct_tabs() {
         UUID questionnaireId = UUID.randomUUID();
 
@@ -60,6 +65,8 @@ class QuestionRepositoryDataJpaTest extends AbstractPostgresIT {
     }
 
     @Test
+    @DisplayName("Returns an empty list when no question tabs exist for a questionnaire")
+
     void findDistinctQuestionTabsByQuestionnaireId_should_return_empty_list_when_no_question_exists() {
         List<String> tabs = questionRepository.findDistinctQuestionTabsByQuestionnaireId(UUID.randomUUID());
 

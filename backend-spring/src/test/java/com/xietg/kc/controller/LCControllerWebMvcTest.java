@@ -11,6 +11,8 @@ import com.xietg.kc.db.repo.QuestionnaireRepository;
 import com.xietg.kc.excel.ExcelBuilder;
 import com.xietg.kc.security.CurrentUserService;
 import com.xietg.kc.security.AuthService;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -69,6 +71,7 @@ class LCControllerWebMvcTest {
     }
 
     @Test
+    @DisplayName("Returns all leadership compass entries for an authenticated user")
     void listLC_should_return_all_lcs() throws Exception {
     	when(authService.requireUser(anyString())).thenReturn(authenticatedUser());
     	when(currentUserService.requireCurrentUser()).thenReturn(authenticatedUser());
@@ -96,6 +99,7 @@ class LCControllerWebMvcTest {
     }
 
     @Test
+    @DisplayName("Creates a leadership compass entry and returns the saved payload")
     void createLC_should_create_and_return_lc() throws Exception {
     	when(authService.requireUser(anyString())).thenReturn(authenticatedUser());
     	when(currentUserService.requireCurrentUser()).thenReturn(authenticatedUser());
@@ -130,6 +134,7 @@ class LCControllerWebMvcTest {
     }
 
     @Test
+    @DisplayName("Returns 400 Bad Request when leadership compass name is blank")
     void createLC_should_return_bad_request_when_name_is_blank() throws Exception {
     	
     	when(authService.requireUser(anyString())).thenReturn(authenticatedUser());
@@ -152,6 +157,7 @@ class LCControllerWebMvcTest {
     }
 
     @Test
+    @DisplayName("Attaches a questionnaire to a leadership compass entry")
     void attachQuestionnaireToLC_should_update_and_return_lc() throws Exception {
     	when(authService.requireUser(anyString())).thenReturn(authenticatedUser());
     	when(currentUserService.requireCurrentUser()).thenReturn(authenticatedUser());
@@ -185,6 +191,7 @@ class LCControllerWebMvcTest {
     }
 
     @Test
+    @DisplayName("Downloads the questionnaire template as an XLSX file")
     void downloadXlsx_should_return_file() throws Exception {
     	when(authService.requireUser(anyString())).thenReturn(authenticatedUser());
     	when(currentUserService.requireCurrentUser()).thenReturn(authenticatedUser());

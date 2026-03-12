@@ -13,6 +13,7 @@ import com.xietg.kc.error.BusinessException;
 import com.xietg.kc.excel.ExcelParseException;
 import com.xietg.kc.excel.ExcelParser;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.mock.web.MockMultipartFile;
@@ -56,6 +57,7 @@ class SubmissionServiceTest {
     }
 
     @Test
+    @DisplayName("Rejects submission creation when the uploaded file is missing")
     void should_reject_missing_file() {
         LCEntity lc = new LCEntity();
         lc.setId(UUID.randomUUID());
@@ -73,6 +75,7 @@ class SubmissionServiceTest {
     }
 
     @Test
+    @DisplayName("Rejects submission creation for a non-XLSX file")
     void should_reject_non_xlsx_file() {
         LCEntity lc = new LCEntity();
         lc.setId(UUID.randomUUID());
@@ -93,6 +96,7 @@ class SubmissionServiceTest {
     }
 
     @Test
+    @DisplayName("Rejects submission creation when the file exceeds 15 MB")
     void should_reject_file_too_large() {
         LCEntity lc = new LCEntity();
         lc.setId(UUID.randomUUID());
@@ -119,6 +123,7 @@ class SubmissionServiceTest {
     }
 
     @Test
+    @DisplayName("Creates a submission and marks it as parsed_ok when parsing succeeds")
     void should_create_submission_and_mark_parsed_ok() throws Exception {
         UUID questionnaireId = UUID.randomUUID();
 
@@ -159,6 +164,7 @@ class SubmissionServiceTest {
     }
 
     @Test
+    @DisplayName("Marks the submission as parse_error when Excel parsing fails")
     void should_mark_submission_parse_error_when_excel_parser_fails() {
         UUID questionnaireId = UUID.randomUUID();
 
@@ -195,6 +201,8 @@ class SubmissionServiceTest {
     }
 
     @Test
+    @DisplayName("Creates a questionnaire automatically when the LC has no questionnaire id")
+
     void should_create_questionnaire_when_lc_has_no_questionnaire_id() {
         LCEntity lc = new LCEntity();
         lc.setId(UUID.randomUUID());

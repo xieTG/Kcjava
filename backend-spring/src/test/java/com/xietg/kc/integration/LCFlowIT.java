@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Map;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +25,8 @@ class LCFlowIT extends AbstractPostgresIT {
     private MockMvc mockMvc;
 
     @Test
+    @DisplayName("Creates a leadership compass entry and retrieves it with a valid JWT")
+
     void shouldCreateAndFetchLC() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
 

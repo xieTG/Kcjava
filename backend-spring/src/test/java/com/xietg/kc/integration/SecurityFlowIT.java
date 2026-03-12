@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Map;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,6 +26,8 @@ class SecurityFlowIT extends AbstractPostgresIT {
 
 
     @Test
+    @DisplayName("Rejects access to protected endpoints when no token is provided")
+
     void shouldRejectAccessWithoutToken() throws Exception {
 
         mockMvc.perform(get("/lcs"))
@@ -32,6 +35,8 @@ class SecurityFlowIT extends AbstractPostgresIT {
     }
 
     @Test
+    @DisplayName("Registers, logs in, and accesses a protected endpoint with a valid JWT")
+
     void shouldRegisterLoginAndAccessProtectedEndpoint() throws Exception {
     	
     	ObjectMapper objectMapper = new ObjectMapper();
