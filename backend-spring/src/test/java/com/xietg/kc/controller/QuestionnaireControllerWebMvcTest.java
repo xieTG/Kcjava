@@ -7,6 +7,7 @@ import com.xietg.kc.db.entity.UserEntity;
 import com.xietg.kc.db.repo.LCRepository;
 import com.xietg.kc.db.repo.QuestionnaireRepository;
 import com.xietg.kc.security.CurrentUserService;
+import com.xietg.kc.security.AuthService;
 import org.springframework.http.HttpHeaders;
 import com.xietg.kc.service.SubmissionService;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,9 @@ class QuestionnaireControllerWebMvcTest {
 
     @MockitoBean
     CurrentUserService currentUserService;
+    
+    @MockitoBean
+    AuthService authService;
 
     @MockitoBean
     SubmissionService submissionService;
@@ -70,6 +74,7 @@ class QuestionnaireControllerWebMvcTest {
         q2.setName("IAM Assessment 2026");
         q2.setVersion(3);
 
+        when(authService.requireUser(anyString())).thenReturn(authenticatedUser());
         when(currentUserService.requireCurrentUser()).thenReturn(authenticatedUser());
         when(questionnaireRepository.findByStatus("published"))
                 .thenReturn(List.of(q1, q2));
@@ -105,6 +110,7 @@ class QuestionnaireControllerWebMvcTest {
                 "fake-xlsx-content".getBytes()
         );
 
+        when(authService.requireUser(anyString())).thenReturn(authenticatedUser());
         when(currentUserService.requireCurrentUser()).thenReturn(user);
         when(lcRepository.findById(lcId)).thenReturn(Optional.of(lc));
         when(submissionService.createSubmission(any(LCEntity.class), any(UserEntity.class), any()))
